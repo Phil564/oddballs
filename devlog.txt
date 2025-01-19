@@ -1,0 +1,1038 @@
+/*
+ *	Project:		Oddballs
+ *	File:			devlog.txt
+ *	Description:	Development log
+ */
+
+------------------------------------------------------------------------
+FRI 13/09/96
+	Creation
+
+	STEVE
+		changed way velocity and speed are handled
+		linked list for actors
+
+	WOODY
+
+	TONY
+		added 5 layer queue support to animation engine
+
+------------------------------------------------------------------------
+MON 16/09/96
+	STEVE
+		ported my collision code from BRender
+		began handling of spherical collision - inertia, gravity, bouncing, rolling
+	WOODY
+		Began simple control of hand.  Added ball control, whacking and releasing
+		the ball.
+	TONY
+		Began work on scripting language and related functions.
+
+------------------------------------------------------------------------
+TUE 17/09/96	Meeting with Dave from Philips.
+	STEVE
+		fixed some bugs and improved bouncing/rolling behaviour
+	WOODY
+		continued working on hand control (added jumping), implemented Steve's collision detection.
+	TONY
+		abandoned the team in the persuit of a solo career.
+
+ ------------------------------------------------------------------------
+WED 18/09/96
+	STEVE
+		added rotations to simulate rolling
+		worked on F&K bugs from Sony
+	WOODY
+		worked on some f&k bugs.
+		replaced hand control method.
+		re-implemented jump, duck, walk, join.
+------------------------------------------------------------------------
+THU 19/09/96
+	STEVE
+		improved rolling onto and off slopes
+		fixed the snapping back problem on sharp corners
+		began work on preventing objects travelling through surfaces
+	WOODY
+		implemented foreign languages in firo & klawd installer.
+		continued with adding hand control things.
+------------------------------------------------------------------------
+FRI 20/09/96
+	STEVE
+		in a desparate bid for attention I attempted to throw myself out of 
+		the window whilst simultaneously chewing off my own tongue (failed 
+		on both counts but I gave it a damn good go I can tell you)
+	WOODY
+		continued with adding hand control things.
+------------------------------------------------------------------------
+MON 23/09/96
+	STEVE
+		 slept a lot
+	WOODY
+		Messed about with a rendition card, couldn't get it to work.
+		worked on f&k cd-audio.
+		fixed problem with hand falling.		
+ ------------------------------------------------------------------------
+TUE 24/09/96
+	STEVE
+		slept a lot more
+	WOODY
+		Started on enemy handling.  
+		messed about with f&k.
+------------------------------------------------------------------------
+WED 25/09/96
+	STEVE
+		off
+	WOODY
+		network down for most of day.
+		hopefully fixed some f&k bugs (backdrop for subgame selecting, added re-tries to loading)
+		continued on enemy control.  Added simple scripting language for enemies.
+------------------------------------------------------------------------
+THU 26/09/96
+	STEVE
+		off
+	WOODY
+		touched up f&k audio tracks.
+		felt ill.
+		worked on enemy control some more.
+			added headto 2d, 3d.
+			looping, following(ball+hand)
+			tomorow look into loop counters...
+------------------------------------------------------------------------
+FRI 27/09/96
+	STEVE
+		improved rolling on and off slopes more
+		looked into the bouncing against edges problem and got nowhere
+		prevented "rattling" if pushing up against a wall
+		fixed the acceleration bug when bouncing next to a vertical wall
+	WOODY
+		off
+------------------------------------------------------------------------
+MON 30/09/96
+	STEVE
+		tidied up collision routine
+		sped up collision by pre-calculating polygon info
+		worked on edge-collision theory and did my brain in
+	WOODY
+		worked on copying mario camera.
+		took a while...
+------------------------------------------------------------------------
+TUE 01/10/96	DirectX Beta expired wasting loads of time for everyone. 
+				All hail Bill Gates!
+	STEVE
+		found handy point-to-line equation and worked on edge-collision
+	WOODY
+		wasted a lot of time thanks to the almighty BG.
+		had meeting to discuss moving over to immediate mode... no way!
+		spent last part of day touching up my files.
+		result = nil. cheers bill.
+------------------------------------------------------------------------
+WED 02/10/96
+	STEVE
+		spent most of day porting my collision code into DragonWars(TM)
+		allowed for objects to stop on slopes
+	WOODY
+		burnt v0.26 F&K.
+		worked on camera movement some more.
+------------------------------------------------------------------------
+THU 03/10/96
+	STEVE
+		more on stopping on slopes - now works pretty much perfectly
+		improved behaviour when flying off the top of slopes - launches into
+		the air correctly rather than rolling over the top
+		saw nasty edge-bouncing bug - don't know what to do about it yet
+	WOODY
+		had normal panic attack about burning CD for phillips, sorted out a few bugs
+		made camera look at a dummy frame, floating above the hand to give better view
+		when playing.
+------------------------------------------------------------------------
+FRI 04/10/96	phillips due for meeting today (richard browne + dave hawkins)
+	STEVE
+		sorted polygon list on centroid Y but this made things go all pear-shaped
+	WOODY
+		i really sould update this file more often.... cant remember, probably camera things
+		and of course the usual F&K stuff.
+		
+------------------------------------------------------------------------
+MON 07/10/96
+	STEVE
+		FIRO & KLAWD got through Sony on 2nd submission!!!
+		Worked a tad on foreign versions of F&K
+		Spent rest of day beating my head against the brick wall of 
+		edge-collision, and finally achieved something maybe???
+	WOODY
+		Yet more work on the camera and f&k.
+------------------------------------------------------------------------
+TUE 08/10/96
+	STEVE
+		off all morning waiting for fridge-man
+		yet more nightmare edge-collision
+	WOODY
+		Decided to re-design the demo level, as the proposed one was toooo difficult to cope with.
+		It involved too much difficult camera work, and not enough gameplay features....
+		Experimenting with collision detection on the camera.
+------------------------------------------------------------------------
+WED 09/10/96
+	STEVE
+		yet more nightmare edge-collision
+		gave up and started space partitioning
+	WOODY
+		Fixed some minor f&k bugs (shocker), tried to burn another CD to catch courier, but of course
+		the drilling and tom-foolery downstairs fucked it up.  Anyway, this is supposed to be a 
+		master!
+		Started on camera control method #2.
+------------------------------------------------------------------------
+THU 10/10/96
+	STEVE
+		worked on voxel space partitioning all day
+	WOODY
+		Fixed some MORE f&k bugs, sent a CD off, this may be the one..... nah!
+		looked into using the ROCKEM shell, but decided that it would be easier and more user
+		friendly to continue using our shell.
+		I think i will become a 3dstudio artist.
+------------------------------------------------------------------------
+FRI 11/10/96
+	STEVE
+		worked on voxel space partitioning all day
+	WOODY
+		Started looking into bouncing the ball.... gulp!
+------------------------------------------------------------------------
+MON 14/10/96
+	STEVE
+		worked on voxel space partitioning all day
+	WOODY
+		Worked some more on bouncing, got some bounce anims from joss..
+		Looked into animation problems with tony and joss.
+------------------------------------------------------------------------
+TUE 15/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Off.  Came in later to burn french, german and spanish versions of firo&klawd.
+------------------------------------------------------------------------
+WED 16/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		More work on bouncing, where do i make the camera look at?, still got problem with 
+		animations not working, also when ball hits vertical wall, the onGround flag is set.
+------------------------------------------------------------------------
+THU 17/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Finaly managed to sort out animations! Solved a lot of problems, to do with animations 
+		not reaching the end.  DX = shat;
+		Experimented with lighting and discovered that the diffuse setting effects how much a 
+		material is effected by lights.
+------------------------------------------------------------------------
+FRI 18/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		We NEED to sort out this z-buffer malarchy.
+		Trying to sort out the transition between bouncing the ball and throwing the ball, depending
+		on how long the joystick button is pressed. It feels a bit tricky.
+------------------------------------------------------------------------
+MON 21/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Sorted out playing of CDDA.  Looking into enemy control again, found a little bugu in the
+		collision routine, which has been sorted.
+		D-X is simply toooooooooooooo slow. 
+------------------------------------------------------------------------
+TUE 22/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Decided to keep the existing enemy control thingy, just for providing simple move to, wait
+		jump, takeoff land things.  Started implementing enemy dependant code, which may involve
+		using existing instructions, but applying different cases for.  I'm not quite sure how
+		it will work out yet, but once i get more enemies in, it should shape up somemore.
+		PC F&K has been passed by BMG wahoooooooooo!
+------------------------------------------------------------------------
+WED 23/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Dave came up from Philips today, he took away a CD, and seemed pleased with progress.
+		Worked on handling the bat, and started a load enemy routine.
+------------------------------------------------------------------------
+THU 24/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Implemented decals, piece of piss, got a few sprite trees on the landscape.
+		Put in chest.
+		Looked into icons, using direct draw surfaces. Need to be able to create a linked list
+		of user surfaces, that can be printed.
+------------------------------------------------------------------------
+FRI 25/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Sorted out transparency on scenic items, and icons etc.  Had to physically change purple
+		colour to black, because DX is too shit to cope with purple transparencies.
+		Just looking into creating an array/linked list of user surfaces now..
+		*	Must look into using the normal of the face that the hand is on to alter height of 
+			camera like mario does..
+		*	also tidy up shell!
+		*	ON MONDAY LOOK INTO ANIMATED SURFACES, WITH NAME MATHCHING ETC!
+		Created user surface list.
+		Sorted out how to do animated decals. - done
+
+------------------------------------------------------------------------
+MON 28/10/96
+	STEVE
+		Ra-ra Rasputin
+	WOODY
+		Sorted animating icons / user surfaces to automatically handle animating icons.
+		looking into making the chest wobble -ooer.
+		joff gave me a new landscape with some tilting platforms in it.
+------------------------------------------------------------------------
+MON 04/11/96
+	STEVE
+		Last week and today: Ra-ra Rasputin and holiday. 
+	WOODY
+		Spent last week helping steve a bit with rasputin, sorted out new PC's, faffed about
+		for ages with 3dfx cards.  Had to re-write the shell, (nicked it from 'rockem') due to 
+		our shell trying to run in a window, which of course the 3dfx cant do.
+		Finally got it to work today, but it is still very slow, 
+		I think it is all to do with the complexity of the models, so something has to be done
+		to break them down into more managable chunks...
+		Spend some time making controls more managable with the higher frame rate, which is now
+		an astonishing 11fps!.
+		Need to put enemies back in, and see if they crash it like they did last week.
+------------------------------------------------------------------------
+TUE 05/11/96
+	STEVE
+		Foolishly I assumed that when you book days off	you don't have to come into work. 
+		How wrong I was.
+		Set up my new machine all day basically.
+	WOODY
+		Put enemies back in, they dont crash it but they do slow it down!  Discussed re-designing
+		the hand with joss, to make it more flexible - made some sample models.
+------------------------------------------------------------------------
+WED 06/11/96
+	STEVE
+		Multiple-object landscape collision and script files in MapChopper and main code.
+	WOODY
+		Added lobster enemy - provisionaly (havent done any special actions yet, just patrol).
+		Looked into new hand design as well, i think it might just work.
+------------------------------------------------------------------------
+THU 07/11/96
+	STEVE
+		More of the same, plus yet more fabby edge-collision. I luv it.
+	WOODY
+		Added attack for lobster, spent most of the afternoon looking into trying to get multiple
+		enemies of the same type animating, but failed.  (sent e-mail to microsoft) bitch!
+------------------------------------------------------------------------
+FRI 08/11/96
+	STEVE
+		Edge-collision yet again. 
+	WOODY
+		Looked into shadows but they are solid black shapes, oh and shite!
+		putted animating debris in, expanding routines to make them more general.
+------------------------------------------------------------------------
+MON 11/11/96
+	STEVE
+		Moving platforms begun. Waypoints, variable speed, wait times, collision, and
+		dragging things along implemented.
+	WOODY
+		Implemented different walk modes.  Hand to enemy collision, and ball to enemy collision.
+------------------------------------------------------------------------
+TUE 12/11/96
+	STEVE
+		More moving platforms, including such wonders as spinning platforms, orbiting
+		platforms and seesaws. Coolamundo.
+	WOODY
+		Spent most of the day putting new hand animations in, and the rest of it doing fiddly
+		stuff.
+------------------------------------------------------------------------
+WED 13/11/96	Phillips here for meeting (Richard Browne + Dave Hawkins) Tex-Mex ahoy!
+	STEVE
+		More work on rotating platforms to enable object carrying etc.
+	WOODY
+		Added new side step mode to original camera mode.  Added variable height jump.
+		Started doing some massive bodges for puzzley things.
+		Started implementing cutlass. + Put some moving platforms in.
+------------------------------------------------------------------------
+THU 14/11/96
+	STEVE
+		Moving platforms refinements. Orbiting and spinning pause points. Improved seesaw
+		action. Helped with putting puzzles into main shell.
+	WOODY
+		Sorted out transparent textures. Added attack to cutlass. Sorted out batty.	Started
+		switch puzzle behind gate. Changed the way the camera tracking works to track a vector
+		rather than an actor, and implemented a camera override function to allow the camera to
+		momentaraly look at other things.
+------------------------------------------------------------------------
+FRI 15/11/96
+	STEVE
+		More platforms code. Spinning platforms rotate actors, and also whack them about - 
+		doesn't work properly yet. 
+	WOODY
+		Implemented circle action, put shadows back in, and made it so anyone can have one!
+------------------------------------------------------------------------
+SAT 16/11/96
+	STEVE
+	WOODY
+		Did some work on the ships wheel puzzle.
+------------------------------------------------------------------------
+MON 18/11/96
+	STEVE
+		Seesaws: mass, max rotation speed, bounce back if they try to push an actor through the
+		floor, whacking working properly I think.
+	WOODY
+		Added scaling shadows, Fixed problem with hole in wall, stopped steep shadows looking
+		silly, did some work on fixing the camera.
+		Finally improved the teleport thing to actually spit you out of the mountain, onto the
+		volcano, added a feature that enables the camera to drift to a particular location, and
+		look at the hand, which allowed me to do loads of bodges! Fixed the long-jump thingy.
+------------------------------------------------------------------------
+TUE 19/11/96
+	STEVE
+		Trampolines. More work on switch-type platforms - switches that stay down as long as the
+		ball is in contact.	Symmetry points for seesaws. Started ropebridges.
+	WOODY
+		Put the punch action in, but it looks shite!
+------------------------------------------------------------------------
+WED 20/11/96
+	STEVE
+		Continued ropebridges - made more general, added them to script file loader - oh, and
+		made them work properly as well.
+	WOODY
+		Implemented spikes, and gave them multiple positions to allow shooting through floor etc.
+		Put trees in by oasis
+------------------------------------------------------------------------
+THU 21/11/96
+	STEVE
+		Titlescreen. Actor-to-actor collision - Sim Pool(TM). Works with spheres of any
+		radius, mass and velocity. Cool.
+	WOODY
+		tweeking and stuff
+------------------------------------------------------------------------
+FRI 22/11/96
+	STEVE
+		Fixed bugu with collision near the edges of the map (falling through the sea). Tweaked
+		actor collision to account for bounce factor - not really sure if it's right.
+		Allowed for background landscape objects (ignored for collision purposes).
+	WOODY
+		worked a lot on bouncing - its so hard to get right! started on teleporting, added some
+		puzzle thingies.
+------------------------------------------------------------------------
+MON 25/11/96
+	STEVE
+		Put the nasty big ball who whacks you about in. Fixed minor bugu with seesaws - dead
+		zone bodge no longer needed. Fixed chest behaviour - actually jumps about.
+	WOODY
+		Put variable throw range, messed about with idle anims (+flick +slap), sorted out camera
+		cut shots.  Put rope bridge in.
+------------------------------------------------------------------------
+TUE 26/11/96
+	STEVE
+		Most of day spent looking at GameGen and talking to Dave. Put timegates in.
+	WOODY
+		Looked at some shite world builder for too long, met dave H, did some code, decided
+		on a course type approach, started adjusting some puzzle elements.
+------------------------------------------------------------------------
+WED 27/11/96
+	STEVE
+		Added enemies to script file. Changed way rope-bridges work - all use AddVisual to the
+		same meshBuilder. Allowed each timegate to activate multiple others. Worked out 
+		positions and orientations for timegates.
+	WOODY
+		Put ball animation in, moved hole in wall, to be hole in gate.  activated the rotating
+		platforms with the platform the ball lands on (after being taken away by parrot)
+------------------------------------------------------------------------
+THU 28/11/96
+	STEVE
+		Added pickups to script file. Worked on enemy placing.
+	WOODY
+		Added water splashes to sea, and oasis, put in magic dust for either speedup, or 
+		teleporting, Finally moved the parot(with 1 arrr) back to his pearch! did some work on
+		fireballs.  Looking into only creating debris if the camera is in range and is looking 
+		at it . Made background items such as water and sky unlit, to avoid any creases.
+------------------------------------------------------------------------
+FRI 29/11/96
+	STEVE
+		Added ping-pong option to platform paths. More enemy placing, plus allowed for multiple
+		copies of an enemy. Half-day.
+	WOODY
+		Added feature to remove scenic items and platforms, if they are too far away from the
+		camera, hopefully this will speed things up. Added hand idle actions (massive bodge
+		of course!). Recieved new joypad from dave H - top!  Started putting in soundfx, found
+		problem with sound routines, fix tomorrow...
+------------------------------------------------------------------------
+MON 02/12/96
+	STEVE
+		Fixed the problems with optimised build (I hope!). More enemy placing. Fiddly bits.
+	WOODY
+		Added some sound effects, tweeked my bits.
+------------------------------------------------------------------------
+TUE 03/12/96
+	STEVE
+		Put hand slapping in - fires an invisible bullet which can knock enemies or platforms
+		about the place. Spent a while on trying to make platforms dip when you jump onto
+		them but eventually realised how many problems it could cause so undid it all.
+	WOODY
+		Fixed the bounce, made it easier to activate, put in special time bonus platforms, and
+		spent a lot of time sorting out sound effects (god knows what we are going to do for 
+		music!).
+------------------------------------------------------------------------
+WED 04/12/96
+	STEVE
+		Changed hand's position in cup/throw etc to account for different ball sizes. Added
+		2 collectables - one increases bounciness and shrinks the ball, other is the reverse.
+	WOODY
+		Changed the throw so you only have to press one button - special change for people with
+		deformed thumbs!  Disabled control on timer, to stop people moving when camera is 
+		looking elsewhere.
+------------------------------------------------------------------------
+THU 05/12/96
+	WOODY & STEVE
+		Played demo for a while trying to find out why it crashes all the bloody time!
+		4.39 pm, still trying to find out why direct x was written so badly.
+		tried just about everything we could so we are going to kill our moomins.
+------------------------------------------------------------------------
+FRI 06/12/96
+	STEVE
+	WOODY
+		Sorted out install program, started resetting all puzzles (nightmare)
+------------------------------------------------------------------------
+MON 09/12/96
+	STEVE &	WOODY
+		Richard Browne here. Tex-Mex a-go-go!
+		Started talking about game design.
+------------------------------------------------------------------------
+TUE 10/12/96
+	STEVE &	WOODY
+		Working on game design doc
+------------------------------------------------------------------------
+WED 11/12/96
+	STEVE &	WOODY
+		Working on game design doc
+------------------------------------------------------------------------
+THU 12/12/96
+	STEVE &	WOODY
+		Nichimen graphics came up and gave us a presentation, oh and lunch! tex-mex.troll
+		Recorded a video of whack 'n roll for philips as well.
+------------------------------------------------------------------------
+FRI 13/12/96
+	STEVE
+		Ill.
+	WOODY
+		Started re-configuring the game design document.  Splitting into sub documents and
+		imbedding all the images into the document.  Also converting images into bmps!
+------------------------------------------------------------------------
+MON 16/12/96
+	STEVE
+		Ill.
+	WOODY
+		game design document
+------------------------------------------------------------------------
+TUE 17/12/96
+	STEVE
+		Firo & Klawd - save game feature (55 bits!).
+	WOODY
+		game design document
+------------------------------------------------------------------------
+WED 18/12/96
+	STEVE
+		Firo & Klawd - save game feature (55 bits!).
+	WOODY
+		game design document
+------------------------------------------------------------------------
+THU 19/12/96
+	STEVE
+		Documentarium and schedule.
+	WOODY
+		game design document
+------------------------------------------------------------------------
+FRI 20/12/96
+	STEVE
+		Documentarium and schedule.
+	WOODY
+		game design document
+------------------------------------------------------------------------
+THU 02/01/97
+	STEVE
+		Holiday.
+	WOODY
+		Started 3dsmax plugin to export individual meshes from animations.
+------------------------------------------------------------------------
+FRI 03/01/97
+	STEVE
+		Holiday.
+	WOODY
+		continued 3dsmax plugin to export individual meshes from animations.
+------------------------------------------------------------------------
+MON 06/01/97
+	STEVE
+		Document, Firo & Klawd Japanese version. Some work on conveyor belts.
+	WOODY
+		3dsmax plugin
+------------------------------------------------------------------------
+TUE 07/01/97
+	STEVE
+		Began hierarchical platform system. Eek.
+	WOODY
+		3dsmax plugin.  Got data into johns objedit.
+------------------------------------------------------------------------
+WED 08/01/97
+	STEVE
+		Continued hierarchical platform system - orbiting and spinning and bears - oh my!. 
+		Eek squared.
+	WOODY
+		finished plugin.  Started playing with oddballs, reduced playground model to achieve
+		30 fps.  Everything feels different, so spend all day tweeking things like gravity, 
+		and velocities and animation speed.  Fixed bug which made bouncing hard.
+------------------------------------------------------------------------
+THU 09/01/97
+	STEVE
+		More of the above. Also added scaleable platforms.
+	WOODY
+		Tweeking control some more.
+------------------------------------------------------------------------
+FRI 10/01/97
+	STEVE
+		Yet more stuff. Spinning now has a flip-flop option. Tidied up lots of stuff. Got rid 
+		of some excess variables in ACTOR and PLATFORM.
+	WOODY
+		Started work on hand walking on top of ball.
+------------------------------------------------------------------------
+MON 13/01/97
+	STEVE
+		More tidying. Reduced size of PLANE and PLATFORM structures. Fixed at least part of
+		the jumping-only-very-pathetically-when-next-to-a-wall problem.
+	WOODY
+		continued with hand walking on ball, made it so you can jump off it to gain height.
+		Started work on generic enemy controller, very hard without slave......
+------------------------------------------------------------------------
+TUE 14/01/97
+	STEVE
+		More work on conveyor belts, including rolling and bouncing on them and flying off 
+		the end.
+	WOODY
+		Started work on new generic enemy controller
+------------------------------------------------------------------------
+WED 15/01/97
+	STEVE
+		Fixed a few tiny bugus - releasing the ball from HAND_JOINED, non-zero Y velocity
+		when walking on the ball etc. Spent an awfully long time trying vainly to speed
+		things up a bit using the (shite) profiler.
+	WOODY
+		Continued enemy controller.  Built basic controller shell, which allows a list of
+		normal instructions, plus a list of attack instructions.  Also a list of instructiuons
+		that can interrupt normal instructions at any time.  Every instruction is conditional.
+		Started work on technical design doc.
+------------------------------------------------------------------------
+THU 16/01/97
+	STEVE
+		Spent most of day updating and tidying up the Map Chopper(TM).
+	WOODY
+		Spent most of the day faffing with new slave, then started programming the individual
+		enemy actions.  MOVETO MOVETO2D, worked on birds flying and banking round corners.
+------------------------------------------------------------------------
+FRI 17/01/97
+	STEVE
+		Bit more on ye olde Mape Choppere. Started destructible platforms - have to kill
+		the platform and all those below it in the tree.
+	WOODY
+		Added more enemy instructions, WAIT, FACETO, RANDOMMOVE (within a box), FACEHAND, FACEBALL,
+		FACECLOSEST, FOLLOWHAND, FOLLOWBALL, FOLLOWCLOSEST (added vector offset, so birds can track
+		above hand etc)
+------------------------------------------------------------------------
+MON 20/01/97
+	STEVE
+		Destructible platforms that vanish if hit by a DESTROYER moving at speed. Crumbling
+		platforms that vanish after a delay whenever they are touched by an actor. 
+		Maybe (please God) fixed one of the hideous edge-collision bugus that has been there
+		ever since the year .(troll). Bit more tidying.
+	WOODY
+		Tested conditional instructions, and attack instructions.  Added HOLDBALL, DROPBALL.
+------------------------------------------------------------------------
+TUE 21/01/97
+	STEVE
+		More speed tweaks - hopefully improved RecalculatePlatformInfo which is horribly
+		slow. More tidying of bits and bobs.
+	WOODY
+		spent the day finishing off the technical design doc, zzzzzZZZZZZ!.  
+------------------------------------------------------------------------
+WED 22/01/97
+	STEVE
+		Worked on platform bounciness - can't decide how it should work. Found lots of silly
+		bugus with jumping on the ball, ball ownership, actor-actor collision and whacking.
+	WOODY
+		Adopted the enemy control code to reduce duplicate routines, such as follow hand,
+		follow ball and follow closest.  Now there is only a follow, with the hand, ball or
+		closest specified by the flags.  Tidied up the process actor script proc, moved all
+		individual instrucion code to enemies.cpp.	Added CHARGE and FLEE instructions.  Fixed
+		problem which stops hand from joining to ball - another Aabs needed!.  Added more 
+		conditions to nme instruction code. Started CIRCLE.
+------------------------------------------------------------------------
+THU 23/01/97
+	STEVE
+		Started work on fans - you can even leave the ball floating above a fan!
+	WOODY
+		Improved circling, added circleX and circleZ (mainly for alien fighter craft). Tweeked
+		jumping, messed about with camera (improved camera positioning when travelling up
+		or down slopes)
+------------------------------------------------------------------------
+FRI 24/01/97
+	STEVE
+		More work on fans - variable radius (sort of) etc. Also did wind which operates only
+		in a box with optional drop-off outside.
+	WOODY
+		Tweaked movement, joystick reading, whacking etc.  Added some platforms into new level.
+------------------------------------------------------------------------
+MON 27/01/97
+	STEVE
+		Made fans an attribute of platforms - makes far more sense anyway. Magnets (fans with a
+		-ve windStrength!!). Fixed bugu in platforms with orbiting children - been there for
+		some time - I test my code SO well!
+	WOODY
+		Fixed problem with 'bouncey camera'. Fixed problem with ballwalk - it was impossible
+		to fall off because of reduced hand maxspeed.  Added cartwheel feature.  Messing about
+		with rolling instead of crawling.  Waiting on anims...
+------------------------------------------------------------------------
+TUE 28/01/97
+	STEVE
+		Teleports - also an attribute of platforms. Can teleport the hand, the ball, the hand
+		and ball joined, and/or enemies. Can teleport to a fixed location or an offset from
+		another platform. Lots of fiddle-faddle with hand actions when the ball hits the
+		teleport. Disappear and reappear delay counters to allow for special effect.
+
+		Fixed bugu with TAKESPIN - spinAxis wasn't being set - to do with my attempts at
+		seesaws spinning and so on - also been there forever.
+	WOODY
+		Improved cartwheel feature, implemented rolling (very slippery!) not sure if they
+		will serve any purpose, but they are fun.  Started the hideous, hideous task of making
+		hand climb down and onto edges - aaaaaaarrrrrrrrgggggghhhhhhhhh!!!!!!!!!!!!!!!
+------------------------------------------------------------------------
+WED 29/01/97
+	STEVE
+		Added shrinky-growy-sparkly effect to teleports.  Fixed problem with hand being
+		stuck to vertical faces.  Assisted woody with edge grappling.
+	WOODY
+		Worked on edge grappling (with wonderful assistance from steve) - all VERY ropey
+		at the moment (no anims - but got clinging and climbing working).
+------------------------------------------------------------------------
+THU 30/01/97
+		Packed up stuff for the office move
+------------------------------------------------------------------------
+FRI 31/01/97
+	STEVE
+		Holiday		
+	WOODY
+		Day off.		
+------------------------------------------------------------------------
+MON 3/02/97
+	STEVE
+		Holiday		
+	WOODY
+		Fixed bug with CLING action.  Continued working with CLING ideas.  decided to 
+		ditch the idea of hanging, and just to jump straight onto the ledge.  Messed about
+		with the slap action, made it a little less ferocious and increased the radius of the 
+		bullet.
+------------------------------------------------------------------------
+TUE 4/02/97
+	STEVE
+		Holiday		
+	WOODY
+		Continued with CLING experiments.  Made camera move smoothly when hand clings to 
+		a ledge.  tweaked climbing down.  Implemented random table although this seems to
+		make little speed difference (may be useful for n64 or playstationII however).
+
+		Two day interview with Robert Pitt.
+------------------------------------------------------------------------
+WED 5/02/97
+	STEVE
+		Holiday		
+	WOODY
+		Put in climb-up anim. tweaked heavy/bouncy ball masses/bounciness as the bouncyball
+		was far to light.  Looking into putting shadows on collectables - probably not worth
+		bothering with until we re-structure the actor structure.  Started work on catapults-
+		made them a part of the platform structure by using a CATAPULT pointer to reference
+		the appropriate data.
+
+		Two day interview with Robert Pitt.
+------------------------------------------------------------------------
+THU 6/02/97
+	STEVE
+		Holiday		
+	WOODY
+		Got the basics of catapults working, but i'm not sure what to do about animating them..
+		Added new feature to 'basic camera intelligence' bit - now the camera makes more of an 
+		effort to keep behind you - seems to make a visible improvement.
+
+		Two day interview with Mark Moore.
+------------------------------------------------------------------------
+FRI 7/02/97
+	STEVE
+		Holiday		
+	WOODY
+		decided to make spikes tiptoe-throughable, so the glove can tiptoe through them...
+		More tweaking with new camera code.  Sat in on an interview with Alex Amtel in the 
+		afternoon.
+
+		Two day interview with Mark Moore.
+------------------------------------------------------------------------
+MON 10/02/97
+	STEVE
+		Holiday		
+	WOODY
+		Wrote little deflag program. Modified enemy control code to allow enemies to pick
+		up hand as well as ball.  Modified drop-ball action to accept a vector, this is
+		the direction to throw player in.
+------------------------------------------------------------------------
+TUE 11/02/97
+	STEVE
+		Firo & Klawd Jap problems . Plus hardware nightmare. Neither black box CD works!
+		Didn't exactly achieve a lot.	
+	WOODY
+		Implemented circle sprites in enemy structure - this will save a lot of polygons.
+		Tweaking fighter behaviour...
+
+------------------------------------------------------------------------
+WED 12/02/97
+	STEVE
+		More F&K. I luv it!. Got basically nowhere.
+------------------------------------------------------------------------
+THU 13/02/97
+	STEVE
+		Tried to do some more luvverly F&K but the black boxes finally died completely.
+		Worked on catapults. And broke them. And finally fixed them again. Allowed for
+		catapults that are rotating in the Y, also put arm rotation and return in ie
+		'animation'.
+	WOODY
+		Working on presentation material and specific enemy code / implementing spheres
+		Went to interplay to present WnR, joystick port broke! presentation suffered.
+------------------------------------------------------------------------
+FRI 14/02/97
+	STEVE
+		More fiddling with catapults - fixed the hand to the arm as it fires up. This broke
+		everything else for ages of course.
+	WOODY
+		Working on presentation material and specific enemy code / implementing spheres
+		Presented WnR to Robb Alvey from MGM.  
+------------------------------------------------------------------------
+MON 17/02/97
+	STEVE
+		New black boxes arrived from Sony - don't work perfectly but an improvement. F&K - 
+		I think I've fixed it thank God - don't understand it though.
+
+		Started terrain types - slidy attribute for ice etc.
+	WOODY
+		Working on presentation material and specific enemy code / implementing spheres
+		Presented WnR to David Sharp from Virgin.  Seemed to go very well - he said
+		he will let us know in 1 week (mmm).
+------------------------------------------------------------------------
+TUE 17/02/97
+	STEVE
+		More on terrain attributes - sliding and stopping on slopes etc. Pendulums - 
+		platforms that oscillate in a simple harmonic fashion. Fixed hand to a moving or
+		rotating platform for CLIMBDOWN and CLIMBUP. Yet more catapult fiddle-faddling - 
+		disabled user input until you hit the floor.
+	WOODY
+		Prepared for presentation with Psygnosis, but Jacqui decided that they
+		would have no interest in N64 titles....
+		Continued working on specific enemy code for 1 level demo (ootw). 
+			- started implemented animations for cylon
+------------------------------------------------------------------------
+WED 18/02/97
+	STEVE
+		Installed new network drivers.
+		Fixed ball-bouncing bugu caused by my tweak to the collision routine.
+		Gave hand a smooth transition to falling animation from DROPDOWN - looks much
+		nicer.
+		Did some tidying of the UpdatePlatform() procedure - took a while to test all
+		the permutations to make sure nothing is busted.
+		Prevented CLIMBDOWN on steep surfaces, force DROPDOWN if the surface gets too
+		steep.
+		Tweaked hand-ball positioning for THROW and JOINED actions - fiddly.troll.
+	WOODY
+		Presentation to GTI.
+		Tweaking cylon patrol movement / added animations
+		Started to make the droid dizzy when hit by the ball.  Fixed some problems with
+		NMEMOVETO2D, this was causing corbers with the cylon.
+------------------------------------------------------------------------
+THU 19/02/97
+	STEVE
+		Tweaked ye camera to look in front of whatever it is tracking.
+	WOODY
+		Spend a long time faffing with joff, to get platforms into ootw level.  Got new 3dfx
+		drivers from the net which improved speed to 30-40 fps!  Must try to keep speed at 30
+		fps as it becomes unplayable.
+------------------------------------------------------------------------
+FRI 20/02/97
+	STEVE
+		Started work on the generic puzzle/switch controller. Decided on it's basic
+		features and started to implement them. Each PUZZLE has a linked list of conditions
+		which must be true and a linked list of actions to execute when this occurs.
+	WOODY
+		faffed about for most of the day getting platforms into level.  Finishing off cylon
+		anims and looking into making fighter fire bullets...
+
+		Ian Livingstone from EIDOS, and Ian Mathias here.
+------------------------------------------------------------------------
+MON 24/02/97
+	STEVE
+		Lots more work on the puzzle controller. Allowed the condition lists to be AND lists
+		or OR lists. Added several more conditions and actions, including the SET_VAR, 
+		CLEAR_VAR actions and VAR_SET, VAR_NOT_SET conditions to allow for very complex
+		puzzles, oh yes indeedio. Put individual timers on each action. Changed condition
+		lists again to allow for ANY (n) type conditions.
+
+		Added LOOK_AT_BALL and LOOK_AT_HAND flags to platforms.
+		Tweaked woody's platformId thingy...		
+	WOODY
+		Implemented new PLATFORMID structure containing faceArray, faceCount, visual.
+		Platforms are now instances of a PLATFORMID. Prevents multiple loading.
+		Generalised bullets by defining standard bullets.  Gave function pointers to actors, so
+		when they die they can all do their thing (most useful for bullets at the moment).
+------------------------------------------------------------------------
+TUE 25/02/97
+	STEVE
+		Added LOOK_AT_POINT flag to platforms so they turn to face the way they're going.
+		Also started the GO_FORWARDS option, where platforms always accelerate forwards,
+		and overshoot their points, with variable banking!
+	WOODY
+		Added enemies to level, also added collision detection to fighter bullets (in callback)
+		to hurt hand and burst ball.  Fixed droid bodge (only worked when facing X'wise!)
+		Improved the effect of hitting the droid with the ball.
+------------------------------------------------------------------------
+WED 26/02/97
+	STEVE
+		Vomited.
+	WOODY
+		Started putting 'sneezy the sheep' in.
+------------------------------------------------------------------------
+THU 27/02/97
+	STEVE
+		Meetings: WarGames PSX Paradroid-style subgame. Discussed changes to game design.
+		Finished GO_FORWARDS. Did SINEBRIDGES. Added SET_NEXT_POINT to puzzle controller 
+		to allow for platforms that sink while you're on them and go back up as soon as you
+		get off.
+	WOODY
+		Lots of meetings, decided to have greek theme as a world, possibly dropping wild west..
+
+------------------------------------------------------------------------
+FRI 28/02/97
+	STEVE
+		Added new features to puzzle controller - SET_NEXT_SPIN and SET_SPIN_AXIS, to allow 
+		for the maze with four tilt buttons to get the ball through. Also did HAND_GOT_ON,
+		BALL_GOT_ON and NME_GOT_ON conditions. Cool. Generalised the ship's wheel / crow's nest 
+		effect (TM) - SPINTOMOVE. Added ORBITBRIDGES.
+	WOODY
+		Trying to get to grips with the fact that any calls to directX get slower and slower 
+		over time.... (the reason for the demo becoming unstable seems to be because transform 
+		actor takes longer and longer, and mallocs every time too.... how? WHY????)
+		Destroyed half of my mouth....
+		Must change the way bullets work, at the moment they only hurt hand/ball when the 
+		bullet dies... <maybe some bulletMaintainCallBack approach>
+------------------------------------------------------------------------
+MON 03/03/97
+	STEVE
+		Added SPINTOSPIN as well as the SPINTOMOVE option, so turning one platform can spin
+		and/or move others. Worked on pushable platforms.
+	WOODY
+		Prepared yet another 2 presentation packs for wnr.  Added maintain callback function
+		for actors (only used for bullets as the moment).  Disabled cling action for the moment
+		as it makes me want to cry...
+		Improved the bullet firing method to allow for enemies to fire up to six bullets
+		worked on sneezy - making him dangerous to touch as well as his spines.
+		Stopped the ball from making droid dizzy if it is not moving - Must fix shadow problem
+		with hand & ball etc
+		Added HAND_HURT action, so there.
+------------------------------------------------------------------------
+TUE 04/03/97
+	STEVE
+		Worked on pushblocks and HAND_PUSH action. Fixed bugus with bullet firing direction.
+		Made eletric floors hurt you, and throw you back towards the last place where you
+		weren't on an electric floor (safe pos).
+	WOODY
+		Started implementing special case camera code (decided that locking the position of 
+		the camera to sweep around corners was not good enough) - added overrideRotation
+		to cameracontrol, so it is possible to specify within a box/radius the angle at which
+		the camera views the hand.
+		Experimenting with making the hand rotate as it rolls ball up slopes.
+		Experimenting with loCamera and hiCamera - bit dodgy at the moment..
+------------------------------------------------------------------------
+WED 05/03/97
+	STEVE
+		Worked on multiple-sphere collision between actors. Added the _TOUCHING and 
+		_JUST_TOUCHED conditions (applied to HAND, BALL or NME) to the puzzle controller.
+	WOODY
+		started re-inventing the basic camera intelligence (again) mario is just tooo
+		clever...
+		Experimented with giving the camera collision, its never going to work!
+------------------------------------------------------------------------
+THU 06/03/97
+	STEVE
+		Put the multiple spheres into the actor-to-landscape collision routine. Eek. Worked
+		eventually (I think). Fixed-ish a couple of minor bugus in the edge-collision while
+		working on making the hand thinner (a stack of 3 small spheres) when cartwheeling - 
+		this is cool, as you have to cartwheel thru small gaps. Not so cool is if you stop
+		cartwheeling in the gap itself - embedded in the wall. Oh well.
+	WOODY
+		Implemented look ahead a la mario, to give player more view of where they are going
+		After looking at mario, decided that they had only two basic camera types..(that i 
+		noticed) One is the camera we already have, the other is PARACAMtm.  Implemented this
+		and worked on smooth transition between the two (also smooth transition with override
+		camera rotations)
+		Implemented script file interpretation for the camera cases.
+------------------------------------------------------------------------
+FRI 07/03/97
+	STEVE
+		Started work on TOPPLE platforms - basically a seesaw variant. Put OverrideCamera
+		options into the puzzle controller - LOOK_AT_PLAT, LOOK_AT_POINT and SET_CAMERA_POS
+		actions. Fixed some bugus with edge collision - you could throw the ball through
+		corners. This caused hideous bugus everywhere else, so put it all back again, then
+		tried a new method of fixing which may have worked even tho it is Bodge City Arizona.
+	WOODY
+		Fixed bug that stopped hand from tilting backwards when you throw.  Implemented
+		multiple camera actions.
+		Fixed bug where hand walks on spot without moving, Reduced the height of the ball
+		when it is whacked.  Fixed bug with 'what slope am i standing on' detection.
+		Still dont know what to do about camera collision detection, or about making the camera
+		turn round corners....fak!
+		Exploring an idea of placing lines at corners... (dont laugh) may just work - i'll see
+		on monday.
+------------------------------------------------------------------------
+MON 10/03/97
+	STEVE
+		Added NME_DEAD condition and NME_GOTO_ACTION action to puzzle controller. 
+		Fixed TOPPLE platforms a bit.
+	WOODY
+		Implemented corner lines... so if the hand passes over a line the camera will rotate
+		round to match the normal of the line.  Decided that you can over exaggerate the normal
+		of the line - depending on which way you cross it.  Worked well so made the extra amount 
+		proportional.  Also stopped swinging camera around if it dosent need to.
+		Implemented script file interpretation for corner cases.
+------------------------------------------------------------------------
+TUE 11/03/97
+	STEVE
+		Monthly WnR team meeting. Discussed garibs, plot etc. Added SET_WIND to puzzle
+		controller. Added NME_MOVE_VECTOR to enemy controller - makes an enemy move along
+		a 3D vector rather than towards a particular point. Tried yet again to solve the
+		edge collision probs - bane of my fewkin' life. Adjusted deceleration behaviour
+		to fix the endless-bouncing-back-and-forth-very-slowly-in-the-trough bugu. Created
+		new bugus shocker.
+	WOODY
+		Recorded a video of WnR using a video camera pointed at the monitor.....
+		Experimented with multiple collision spheres around the hand while it is joined to the
+		ball - not too clever
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Fix bug where hand never stops walking against a wall.troll
+
+		Finish bit in actors.cpp - line 694-ish - check for slope and slideLimit in 2nd case.
+
+		Put rotation in on safePos. Maybe also set safePos back by (hand.vel * scale)? Move 
+		safePos setting to after onGround determination
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+

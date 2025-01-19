@@ -1,0 +1,536 @@
+/*
+ *  Project:         MapChopper
+ *  File:            platforms.cpp
+ *  Description:     
+ *
+ *  (c)1996 ISL.
+ */
+
+
+#include "oddballs.h"
+#include "platforms.h"
+
+PLATFORMLIST	platformList;
+
+/*	--------------------------------------------------------------------------------
+	Function 	: AddPlaneToList()
+	Purpose 	: adds a plane pointer to a plane list
+	Parameters 	: plane pointer, plane list pointer
+	Returns 	: none
+	Info 		:
+*/
+void AddPlaneToList(PLANE *plane,PLANELIST *pl)
+{
+	PLANELISTENTRY	*newPtr;
+
+	newPtr = (PLANELISTENTRY *)malloc(sizeof(PLANELISTENTRY));
+
+	newPtr->next = pl->head.next;
+	newPtr->prev = &pl->head;
+	pl->head.next->prev = newPtr;
+	pl->head.next = newPtr;
+
+	newPtr->plane = plane;
+	pl->numEntries++;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlaneList()
+	Purpose 	: initialises a plane list
+	Parameters 	: pointer to list
+	Returns 	: none
+	Info 		:
+*/
+void InitPlaneList(PLANELIST *pl)
+{
+	pl->numEntries = 0;
+	pl->head.next = &pl->head;
+	pl->head.prev = &pl->head;
+	pl->head.plane = 0;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlatformList()
+	Purpose 	: initialises the linked list of platforms
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void InitPlatformList()
+{
+	platformList.numEntries = 0;
+	platformList.head.next = platformList.head.prev = &platformList.head;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ClearPlatformList()
+	Purpose 	: frees up memory used in platform list
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ClearPlatformList()
+{
+	PLATFORMLISTENTRY	*ptr1,*ptr2;
+
+	for(ptr1 = platformList.head.next;ptr1 != &platformList.head;ptr1 = ptr2)
+	{
+		ptr1->platform->listPointer = 0;
+		ptr2 = ptr1->next;
+		MyFree((void **)&ptr1);
+	}
+	InitPlatformList();
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: AddPlatform()
+	Purpose 	: adds a platform to the linked list
+	Parameters 	: pointer to platform
+	Returns 	: none
+	Info 		:
+*/
+void AddPlatform(PLATFORM *platform)
+{
+	int	j;
+
+	if(platform->listPointer == 0)
+	{
+		platformList.numEntries++;
+		platform->listPointer = (PLATFORMLISTENTRY *)malloc(sizeof(PLATFORMLISTENTRY));
+		platform->listPointer->prev = &platformList.head;
+		platform->listPointer->next = platformList.head.next;
+		platformList.head.next->prev = platform->listPointer;
+		platformList.head.next = platform->listPointer;
+		platform->listPointer->platform = platform;
+	}
+}
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: SubPlatform()
+	Purpose 	: removes an platform from the linked list
+	Parameters 	: pointer to platform
+	Returns 	: none
+	Info 		:
+*/
+void SubPlatform(PLATFORM *platform)
+{
+	if(platform->listPointer != 0)
+	{
+		platform->listPointer->prev->next = platform->listPointer->next;
+		platform->listPointer->next->prev = platform->listPointer->prev;
+		MyFree((void **)&platform->listPointer);
+		platformList.numEntries--;
+	}
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: TransformPlatform()
+	Purpose 	: applies translation and rotations to an platform
+	Parameters 	: platform to update
+	Returns 	: none
+	Info 		:
+*/
+void TransformPlatform(PLATFORM *platform)
+{
+	platform->frame->AddRotation(D3DRMCOMBINE_REPLACE, D3DVAL(0), D3DVAL(1), D3DVAL(0), D3DVAL(platform->rot.v[Y]));
+	platform->frame->AddRotation(D3DRMCOMBINE_BEFORE,  D3DVAL(1), D3DVAL(0), D3DVAL(0), D3DVAL(platform->rot.v[X]));
+	platform->frame->AddRotation(D3DRMCOMBINE_BEFORE,  D3DVAL(0), D3DVAL(0), D3DVAL(1), D3DVAL(platform->rot.v[Z]));
+	platform->frame->SetPosition(g_lpScene, D3DVAL(platform->pos.v[X]), D3DVAL(platform->pos.v[Y]), D3DVAL(platform->pos.v[Z]));
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: UpdatePlatform()
+	Purpose 	: updates an platform - movement and collision
+	Parameters 	: platform to update
+	Returns 	: none
+	Info 		:
+*/
+void UpdatePlatform(PLATFORM *platform)
+{
+	int					i,j;
+	DWORD				numVertices;
+	double				dist,speed,angle,xdist,zdist,num = 0;
+	VECTOR				nearestPoint,vel[10];
+	LPDIRECT3DRMFACE	face;
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	double				d[2],ang;
+
+	if(platform->numPathPoints > 1)
+	{
+		SubVector(&platform->vel,&platform->pathPoint[platform->nextPoint],&platform->pos);
+		dist = Magnitude(&platform->vel);
+		if(dist < platform->maxSpeed)
+		{
+			SetVector(&platform->pos,&platform->pathPoint[platform->nextPoint]);
+			if(platform->counter == 0)
+			{
+				platform->nextPoint = (platform->nextPoint + 1) MOD platform->numPathPoints;
+				platform->counter = platform->waitTime[platform->nextPoint];
+			}
+			else
+				platform->counter--;
+		}
+		else
+		{
+			ScaleVector(&platform->vel,platform->maxSpeed/dist);
+			for(i = X;i <= Z;i++)
+			{
+				platform->oldpos.v[i] = platform->pos.v[i];
+				platform->pos.v[i] += platform->vel.v[i];
+			}
+		}
+	}
+
+	if(platform->spinSpeed != 0)
+		for(i = X;i <= Z;i++)
+			if(platform->spinAxis.v[i] != 0)
+				platform->rotvel.v[i] = platform->spinSpeed;
+
+	if(platform->orbitSpeed != 0)
+	{
+		j = 0;
+		for(i = X;i <= Z;i++)
+		{
+			if(platform->orbitAxis.v[i] == 0)
+				d[j++] = platform->pos.v[i] - platform->orbitPoint.v[i];
+		}
+		dist = sqrt(d[0]*d[0] + d[1]*d[1]);
+		ang = atan2(d[1],d[0]);
+		ang += platform->orbitSpeed;
+		ang = Aabs(ang);
+		d[0] = dist*cos(ang);
+		d[1] = dist*sin(ang);
+		j = 0;
+		for(i = X;i <= Z;i++)
+		{
+			platform->oldpos.v[i] = platform->pos.v[i];
+			if(platform->orbitAxis.v[i] == 0)
+				platform->pos.v[i] = d[j++] + platform->orbitPoint.v[i];
+			platform->vel.v[i] = platform->pos.v[i] - platform->oldpos.v[i];
+		}
+	}
+	else
+	{
+		platform->speed = Magnitude(&platform->vel);
+		if(platform->speed > platform->maxSpeed)
+			ScaleVector(&platform->vel,platform->maxSpeed/platform->speed);
+	}
+
+	for(i = X;i <= Z;i++)
+	{
+	//handle rotations
+		#define MAXROTSPEED 0.3
+
+		if(platform->rotvel.v[i] > MAXROTSPEED)
+			platform->rotvel.v[i] = MAXROTSPEED;
+		if(platform->rotvel.v[i] < -MAXROTSPEED)
+			platform->rotvel.v[i] = -MAXROTSPEED;
+
+		platform->rot.v[i] += platform->rotvel.v[i];
+		platform->rot.v[i] = platform->rot.v[i] > PI ? platform->rot.v[i] - 2 * PI : platform->rot.v[i];
+		platform->rot.v[i] = platform->rot.v[i] < -PI ? platform->rot.v[i] + 2 * PI : platform->rot.v[i];
+
+		if(platform->maxRot > 0)
+		{
+			if(platform->rot.v[i] > platform->maxRot)
+				platform->rot.v[i] = platform->maxRot;
+			else if(platform->rot.v[i] < -platform->maxRot)
+				platform->rot.v[i] = -platform->maxRot;
+		}
+
+/*		if(platform->rAim.v[i] == ON)
+		{
+			platform->rotaim.v[i] = platform->rotaim.v[i] > (2 * PI) ? platform->rotaim.v[i] - 2 * PI : platform->rotaim.v[i];
+			platform->rotaim.v[i] = platform->rotaim.v[i] < 0 ? platform->rotaim.v[i] += 2 * PI : platform->rotaim.v[i];
+
+ 			if(platform->rot.v[i] < platform->rotaim.v[i])
+			{
+				if(platform->rotaim.v[i] - platform->rot.v[i] > PI)
+					platform->rot.v[i] -= FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) / 2;
+				else		
+					platform->rot.v[i] += FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) / 2;
+			}
+			if(platform->rot.v[i] > platform->rotaim.v[i])
+			{
+				if(platform->rot.v[i] - platform->rotaim.v[i] > PI)
+					platform->rot.v[i] += FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) / 2;
+				else		
+					platform->rot.v[i] -= FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) / 2;
+			}
+		}
+*/
+
+		if(platform->rAim.v[i] == ON)
+		{
+			platform->rotaim.v[i] = platform->rotaim.v[i] > (2 * PI) ? platform->rotaim.v[i] - 2 * PI : platform->rotaim.v[i];
+			platform->rotaim.v[i] = platform->rotaim.v[i] < 0 ? platform->rotaim.v[i] += 2 * PI : platform->rotaim.v[i];
+
+			if(platform->actorInContact == 0)
+			{
+				if(FindShortestAngle(platform->rot.v[i],platform->rotaim.v[i]) <= 0.01)
+					platform->rot.v[i] = platform->rotaim.v[i];
+				else if(platform->rot.v[i] < platform->rotaim.v[i] - platform->turnSpeed)
+				{
+					if(platform->rotaim.v[i] - platform->rot.v[i] > PI - platform->turnSpeed)
+						platform->rotvel.v[i] -= Min(platform->turnSpeed,FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) );
+					else		
+						platform->rotvel.v[i] += Min(platform->turnSpeed,FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) );
+				}
+				else if(platform->rot.v[i] > platform->rotaim.v[i] + platform->turnSpeed)
+				{
+					if(platform->rot.v[i] - platform->rotaim.v[i] > PI + platform->turnSpeed)
+						platform->rotvel.v[i] += Min(platform->turnSpeed,FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) );
+					else		
+						platform->rotvel.v[i] -= Min(platform->turnSpeed,FindShortestAngle(platform->rot.v[i], platform->rotaim.v[i]) );
+				}
+			}
+		}
+
+		platform->rotvel.v[i] *= platform->rotInertia;
+	}	
+
+	platform->actorInContact = 0;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlatformInfo()
+	Purpose 	: initialises info for platform's polygons for collision routines
+	Parameters 	: platform
+	Returns 	: none
+	Info 		:
+*/
+void InitPlatformInfo(PLATFORM *platform)
+{
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	D3DVECTOR			normal;
+	LPDIRECT3DRMFACE	face;
+	int					i,j,k,l,big;
+	DWORD				numVertices;
+	double				m;
+	VECTOR				p;
+	PLANE				*planes;
+	double				max = 0;
+
+	planes = (PLANE *)malloc(platform->faceCount * sizeof(PLANE));	
+
+	InitPlaneList(&platform->planeList);
+
+	for(j = 0;j < platform->faceCount;j++)
+	{
+		(planes+j)->index = j;
+
+		platform->faceArray->GetElement(j,&face);
+		face->GetVertices(&numVertices,NULL,NULL);		
+		face->GetVertices(&numVertices,vert,vNormal);
+		face->GetNormal(&normal);
+
+		for(k = 0;k < numVertices;k++)
+		{
+			vert[k].x += platform->pos.v[X];
+			vert[k].y += platform->pos.v[Y];
+			vert[k].z += platform->pos.v[Z];
+		}
+
+		(planes+j)->J = -(vert[0].x*normal.x + vert[0].y*normal.y + vert[0].z*normal.z);
+		m = max(fabs(normal.x),max(fabs(normal.y),fabs(normal.z)));
+		if(m == fabs(normal.x))
+		{
+			(planes+j)->i[0] = 0;
+			(planes+j)->i[1] = 1;
+			(planes+j)->i[2] = 2;
+		}
+		else if (m == fabs(normal.y))
+		{
+			(planes+j)->i[0] = 1;
+			(planes+j)->i[1] = 2;
+			(planes+j)->i[2] = 0;
+		}
+		else
+		{
+			(planes+j)->i[0] = 2;
+			(planes+j)->i[1] = 0;
+			(planes+j)->i[2] = 1;
+		}
+		(planes+j)->normal.v[X] = normal.x;
+		(planes+j)->normal.v[Y] = normal.y;
+		(planes+j)->normal.v[Z] = normal.z;
+
+		(planes+j)->numVertices	= numVertices;
+
+		for(k = 0;k < (planes+j)->numVertices;k++)
+		{
+			(planes+j)->vertex[k].v[X] = vert[k].x;
+			(planes+j)->vertex[k].v[Y] = vert[k].y;
+			(planes+j)->vertex[k].v[Z] = vert[k].z;
+
+			SubVector(&p,&(planes+j)->vertex[k],&platform->pos);
+			m = Magnitude(&p);
+			if(m > max)
+				max = m;			
+		}
+
+		(planes+j)->u1 = (planes+j)->vertex[1].v[(planes+j)->i[1]] - (planes+j)->vertex[0].v[(planes+j)->i[1]];
+		(planes+j)->u2 = (planes+j)->vertex[2].v[(planes+j)->i[1]] - (planes+j)->vertex[0].v[(planes+j)->i[1]];
+
+		(planes+j)->v1 = (planes+j)->vertex[1].v[(planes+j)->i[2]] - (planes+j)->vertex[0].v[(planes+j)->i[2]];
+		(planes+j)->v2 = (planes+j)->vertex[2].v[(planes+j)->i[2]] - (planes+j)->vertex[0].v[(planes+j)->i[2]];
+
+		AddPlaneToList(planes+j,&platform->planeList);
+	}
+	platform->radius = max;
+}
+						    
+
+/*	--------------------------------------------------------------------------------
+	Function 	: RecalculatePlatformInfo()
+	Purpose 	: recalculates planes info for a platform 
+	Parameters 	: platform
+	Returns 	: none
+	Info 		:
+*/
+void RecalculatePlatformInfo(PLATFORM *platform)
+{
+	PLANE				*plane;
+	PLANELISTENTRY		*ptr = platform->planeList.head.prev;
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	D3DVECTOR			normal;
+	LPDIRECT3DRMFACE	face;
+	int					i,j,k,l,big;
+	DWORD				numVertices;
+	double				m,dist,ang;
+	VECTOR				p;
+
+	platform->lastCalcFrame = frameCount;
+
+	for(j = 0;j < platform->faceCount;j++)
+	{
+		plane = ptr->plane;
+
+		ptr = ptr->prev;
+
+		platform->faceArray->GetElement(j,&face);
+		face->GetVertices(&numVertices,NULL,NULL);		
+		face->GetVertices(&numVertices,vert,vNormal);
+		face->GetNormal(&normal);
+
+		for(k = 0;k < numVertices;k++)
+		{
+			if(platform->rot.v[X] != 0)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].z,vert[k].y);
+				ang += platform->rot.v[X];
+				ang = Aabs(ang);
+
+				vert[k].z = dist*sin(ang);
+				vert[k].y = dist*cos(ang);
+			}
+			if(platform->rot.v[Y] != 0)
+			{
+				dist = sqrt(vert[k].x*vert[k].x + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].x,vert[k].z);
+				ang += platform->rot.v[Y];
+				ang = Aabs(ang);
+
+				vert[k].x = dist*sin(ang);
+				vert[k].z = dist*cos(ang);
+			}
+			if(platform->rot.v[Z] != 0)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].x*vert[k].x);
+
+				ang = atan2(vert[k].y,vert[k].x);
+				ang += platform->rot.v[Z];
+				ang = Aabs(ang);
+
+				vert[k].y = dist*sin(ang);
+				vert[k].x = dist*cos(ang);
+			}
+
+
+			vert[k].x += platform->pos.v[X];
+			vert[k].y += platform->pos.v[Y];
+			vert[k].z += platform->pos.v[Z];
+		}
+
+		if(platform->rot.v[X] != 0)
+		{
+			ang = atan2(normal.z,normal.y);
+			ang += platform->rot.v[X];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.z*normal.z);
+
+			normal.z = dist*sin(ang);
+			normal.y = dist*cos(ang);
+		}
+		if(platform->rot.v[Y] != 0)
+		{
+			ang = atan2(normal.x,normal.z);
+			ang += platform->rot.v[Y];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.x*normal.x + normal.z*normal.z);
+
+			normal.x = dist*sin(ang);
+			normal.z = dist*cos(ang);
+		}
+		if(platform->rot.v[Z] != 0)
+		{
+			ang = atan2(normal.y,normal.x);
+			ang += platform->rot.v[Z];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.x*normal.x);
+
+			normal.y = dist*sin(ang);
+			normal.x = dist*cos(ang);
+		}
+
+		plane->J = -(vert[0].x*normal.x + vert[0].y*normal.y + vert[0].z*normal.z);
+		
+		if(platform->flags & TILTING)
+		{
+			m = max(fabs(normal.x),max(fabs(normal.y),fabs(normal.z)));
+			if(m == fabs(normal.x))
+			{
+				plane->i[0] = 0;
+				plane->i[1] = 1;
+				plane->i[2] = 2;
+			}
+			else if (m == fabs(normal.y))
+			{
+				plane->i[0] = 1;
+				plane->i[1] = 2;
+				plane->i[2] = 0;
+			}
+			else
+			{
+				plane->i[0] = 2;
+				plane->i[1] = 0;
+				plane->i[2] = 1;
+			}
+			plane->normal.v[X] = normal.x;
+			plane->normal.v[Y] = normal.y;
+			plane->normal.v[Z] = normal.z;
+		}
+
+		for(k = 0;k < plane->numVertices;k++)
+		{
+			plane->vertex[k].v[X] = vert[k].x;
+			plane->vertex[k].v[Y] = vert[k].y;
+			plane->vertex[k].v[Z] = vert[k].z;
+		}
+		plane->u1 = plane->vertex[1].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+		plane->u2 = plane->vertex[2].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+
+		plane->v1 = plane->vertex[1].v[plane->i[2]] - plane->vertex[0].v[plane->i[2]];
+		plane->v2 = plane->vertex[2].v[plane->i[2]] - plane->vertex[0].v[plane->i[2]];
+	}
+}

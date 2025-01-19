@@ -1,0 +1,1221 @@
+/*
+ *  Project:         MapChopper
+ *  File:            platforms.cpp
+ *  Description:     
+ *
+ *  (c)1996 ISL.
+ */
+
+
+#include "oddballs.h"
+#include "platforms.h"
+#include "collectables.h"
+#include "sound.h"
+#include "collision.h"
+
+PLATFORMLIST	platformList;
+ROPEBRIDGE		ropeBridge[NUMROPEBRIDGES];
+
+/*	--------------------------------------------------------------------------------
+	Function 	: AddPlaneToList()
+	Purpose 	: adds a plane pointer to a plane list
+	Parameters 	: plane pointer, plane list pointer
+	Returns 	: none
+	Info 		:
+*/
+void AddPlaneToList(PLANE *plane,PLANELIST *pl)
+{
+	PLANELISTENTRY	*newPtr;
+
+	newPtr = (PLANELISTENTRY *)malloc(sizeof(PLANELISTENTRY));
+
+	newPtr->next = pl->head.next;
+	newPtr->prev = &pl->head;
+	pl->head.next->prev = newPtr;
+	pl->head.next = newPtr;
+
+	newPtr->plane = plane;
+	pl->numEntries++;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlaneList()
+	Purpose 	: initialises a plane list
+	Parameters 	: pointer to list
+	Returns 	: none
+	Info 		:
+*/
+void InitPlaneList(PLANELIST *pl)
+{
+	pl->numEntries = 0;
+	pl->head.next = &pl->head;
+	pl->head.prev = &pl->head;
+	pl->head.plane = 0;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlatformList()
+	Purpose 	: initialises the linked list of platforms
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void InitPlatformList()
+{
+	platformList.numEntries = 0;
+	platformList.head.next = platformList.head.prev = &platformList.head;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ClearPlatformList()
+	Purpose 	: frees up memory used in platform list
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ClearPlatformList()
+{
+	PLATFORMLISTENTRY	*ptr1,*ptr2;
+
+	for(ptr1 = platformList.head.next;ptr1 != &platformList.head;ptr1 = ptr2)
+	{
+		ptr1->platform->listPointer = 0;
+		ptr2 = ptr1->next;
+		MyFree((void **)&ptr1);
+	}
+	InitPlatformList();
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: AddPlatform()
+	Purpose 	: adds a platform to the linked list
+	Parameters 	: pointer to platform
+	Returns 	: none
+	Info 		:
+*/
+void AddPlatform(PLATFORM *platform)
+{
+	if(platform->listPointer == 0)
+	{
+		platformList.numEntries++;
+		platform->listPointer = (PLATFORMLISTENTRY *)MyMalloc(sizeof(PLATFORMLISTENTRY));
+		platform->listPointer->next = &platformList.head;
+		platform->listPointer->prev = platformList.head.prev;
+		platformList.head.prev->next = platform->listPointer;
+		platformList.head.prev = platform->listPointer;
+		platform->listPointer->platform = platform;
+	}
+}
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: SubPlatform()
+	Purpose 	: removes a platform from the linked list
+	Parameters 	: pointer to platform
+	Returns 	: none
+	Info 		:
+*/
+void SubPlatform(PLATFORM *platform)
+{
+	if(platform->listPointer != 0)
+	{
+		platform->listPointer->prev->next = platform->listPointer->next;
+		platform->listPointer->next->prev = platform->listPointer->prev;
+		MyFree((void **)&platform->listPointer);
+		platformList.numEntries--;
+	}
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: KillPlatform()
+	Purpose 	: destroys a platform and all it's children for good
+	Parameters 	: pointer to platform
+	Returns 	: none
+	Info 		:
+*/
+void KillPlatform(PLATFORM *platform)
+{
+	int	j,numChecked = 0;
+	PLATFORMLISTENTRY *ptr1,*ptr2;
+	ACTORLISTENTRY *aptr;
+	PLATFORM *plat;
+
+	for(aptr = actorList.head.next;aptr != &actorList.head;aptr = aptr->next)
+	{
+		if(aptr->actor->platform == platform)
+			aptr->actor->platform = NULL;
+		if(aptr->actor->oldPlatform == platform)
+			aptr->actor->oldPlatform = NULL;
+	}
+
+	for(ptr1 = platformList.head.next;numChecked < platformList.numEntries;ptr1 = ptr2)
+	{
+		numChecked++;
+		if(ptr1->platform->parentPlatform == platform)
+		{
+			KillPlatform(ptr1->platform);
+			ptr2 = platformList.head.next;
+			numChecked = 0;
+		}
+		else
+			ptr2 = ptr1->next;
+	}
+	SubPlatform(platform);
+	for(j = 0;j < MAXPLATFORMPATHPOINTS;j++)
+		MyFree((void **)&platform->pathPoint[j]);
+	MyFree((void **)&platform->confineBox);
+	if((platform->flags & DUMMY) == 0)
+		RemoveVisuals(platform->frame);
+	MyFree((void **)&platform);
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: 
+	Purpose 	: 
+	Parameters 	: 
+	Returns 	: 
+	Info 		:
+*/
+void KillPlatformOld(PLATFORM *platform)
+{
+	int	j;
+	PLATFORMLISTENTRY *ptr1,*ptr2;
+	ACTORLISTENTRY *aptr;
+	PLATFORM *plat;
+
+	for(aptr = actorList.head.next;aptr != &actorList.head;aptr = aptr->next)
+	{
+		if(aptr->actor->platform == platform)
+			aptr->actor->platform = NULL;
+		if(aptr->actor->oldPlatform == platform)
+			aptr->actor->oldPlatform = NULL;
+	}
+
+	for(ptr1 = platformList.head.next;ptr1 != &platformList.head;ptr1 = ptr2)
+	{
+		if(ptr1->platform->parentPlatform == platform)
+		{
+			plat = ptr1->platform;
+			for(ptr2 = ptr1->next;ptr2 != &platformList.head;ptr2 = ptr2->next)
+				if(ptr2->platform->parentPlatform == plat)
+					plat = ptr2->platform;
+				else
+					break;
+			KillPlatform(ptr1->platform);
+		}
+		else
+			ptr2 = ptr1->next; 
+	}
+	SubPlatform(platform);
+	for(j = 0;j < MAXPLATFORMPATHPOINTS;j++)
+		MyFree((void **)&platform->pathPoint[j]);
+	MyFree((void **)&platform->confineBox);
+	if((platform->flags & DUMMY) == 0)
+		RemoveVisuals(platform->frame);
+	MyFree((void **)&platform);
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: TransformPlatform()
+	Purpose 	: applies translation and rotations to an platform
+	Parameters 	: platform to update
+	Returns 	: none
+	Info 		:
+*/
+void TransformPlatform(PLATFORM *platform)
+{
+	volatile float	x,y,z;
+
+	if(platform->flags & DUMMY)
+		return;
+
+	platform->frame->AddRotation(D3DRMCOMBINE_REPLACE, D3DVAL(0), D3DVAL(1), D3DVAL(0), D3DVAL(platform->rot.v[Y]));
+	platform->frame->AddRotation(D3DRMCOMBINE_BEFORE,  D3DVAL(1), D3DVAL(0), D3DVAL(0), D3DVAL(platform->rot.v[X]));
+	platform->frame->AddRotation(D3DRMCOMBINE_BEFORE,  D3DVAL(0), D3DVAL(0), D3DVAL(1), D3DVAL(platform->rot.v[Z]));
+	platform->frame->AddScale(D3DRMCOMBINE_BEFORE,D3DVAL(platform->scale.v[X]),D3DVAL(platform->scale.v[Y]),D3DVAL(platform->scale.v[Z]));
+	if(platform->crumbleCounter)
+	{
+		x = platform->pos.v[X] + ((double)(rand() MOD 120)/200) - 0.3;
+		y = platform->pos.v[Y];// + ((double)(rand() MOD 100)/400) - 0.25;
+		z = platform->pos.v[Z] + ((double)(rand() MOD 120)/400) - 0.3;
+		platform->frame->SetPosition(platform->parent,D3DVAL(x),D3DVAL(y),D3DVAL(z));
+	}
+	else
+		platform->frame->SetPosition(platform->parent, D3DVAL(platform->pos.v[X]), D3DVAL(platform->pos.v[Y]), D3DVAL(platform->pos.v[Z]));
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: UpdatePlatform()
+	Purpose 	: updates an platform - movement and collision
+	Parameters 	: platform to update
+	Returns 	: none
+	Info 		:
+*/
+void UpdatePlatform(PLATFORM *platform)
+{
+	int					i,j,k,quad;
+	double				dist,num = 0;
+	VECTOR				pos,nextPoint;
+	VECTOR				distance;
+	double				d[2],dd[2],ang,val,ang2;
+	PLATFORM			*plat;
+
+	if(platform->crumbleCounter > 0)
+	{
+		if(platform->crumbleCounter++ > platform->crumbleLimit)
+			platform->flags |= DESTROYED;
+	}
+
+	//stretching and squashing
+	if(platform->stretchTime)
+	{
+		j = 0;
+		if(platform->stretchCounter > 1)
+			platform->stretchCounter--;
+		else if(platform->stretchCounter < -1)
+			platform->stretchCounter++;
+		else if(platform->stretchCounter != 0)
+		{
+			for(i = X;i <= Z;i++)
+			{
+				if(platform->stretchCounter == 1)
+					platform->scale.v[i] += (platform->stretchScale.v[i] - platform->initScale.v[i])/platform->stretchTime;
+				else if(platform->stretchCounter == -1)
+					platform->scale.v[i] -= (platform->stretchScale.v[i] - platform->initScale.v[i])/platform->stretchTime;
+
+				if(fabs(platform->scale.v[i] - platform->stretchScale.v[i]) <= 0.0001)
+				{
+					j++;
+					platform->scale.v[i] = platform->stretchScale.v[i];
+				}
+				else if(fabs(platform->scale.v[i] - platform->initScale.v[i]) <= 0.0001)
+				{
+					j++;
+					platform->scale.v[i] = platform->initScale.v[i];
+				}
+			}
+		}
+		if(j == 3)
+			platform->stretchCounter = -platform->stretchCounter*(platform->stretchWait + 1);
+	
+		platform->radius = platform->initRadius * max(max(platform->scale.v[X]/platform->initScale.v[X],platform->scale.v[Y]/platform->initScale.v[Y]),platform->scale.v[Z]/platform->initScale.v[Z]);
+	}
+
+	//parent's position
+	plat = platform->parentPlatform;
+	while(plat != NULL)
+	{
+		for(i = X;i <= Z;i++)
+			platform->pos.v[i] += plat->pos.v[i] - plat->oldpos.v[i];
+		plat = plat->parentPlatform;
+	}
+
+	plat = platform->parentPlatform;
+
+	SetVector(&platform->oldpos,&platform->pos);
+	SetVector(&platform->oldrot,&platform->rot);
+	if(platform->numPathPoints > 1)
+	{
+		SetVector(&nextPoint,platform->pathPoint[platform->nextPoint]);
+	}
+
+	//parent's orientation
+	if((plat != NULL) && (plat->flags & TILTING) && (platform->flags & TAKESPIN))
+	{
+		if(plat->rot.v[Y] - plat->oldrot.v[Y])
+			RotateVector2D(&platform->vel,&platform->vel,plat->rot.v[Y] - plat->oldrot.v[Y]);
+		else if(plat->rot.v[X] - plat->oldrot.v[X])
+			RotateVector2DXYZ(&platform->vel,&platform->vel,plat->oldrot.v[X] - plat->rot.v[X],X);
+		else if(plat->rot.v[Z] - plat->oldrot.v[Z])
+			RotateVector2DXYZ(&platform->vel,&platform->vel,plat->oldrot.v[Z] - plat->rot.v[Z],Z);
+
+		j = 0;
+		k = 10;
+		for(i = X;i <= Z;i++)
+		{
+			if(plat->rot.v[i] != plat->oldrot.v[i])
+			{
+				platform->rot.v[i] = Aabs(platform->rot.v[i] + plat->rot.v[i] - plat->oldrot.v[i]);
+				platform->rotaim.v[i] = Aabs(platform->rot.v[i] + plat->rot.v[i] - plat->oldrot.v[i]);
+			}
+
+			if(plat->spinAxis.v[i] == 0)
+			{
+				d[j] = platform->pos.v[i] - plat->pos.v[i];
+				dd[j] = platform->pathPoint[platform->nextPoint]->v[i];
+				j++;
+			}
+			else
+				k = i;
+		}
+
+		if(k != 10)
+		{
+			dist = sqrt(d[0]*d[0] + d[1]*d[1]);
+			ang = atan2(d[1],d[0]);
+
+			if(k == Y)
+				ang -= plat->rot.v[Y] - plat->oldrot.v[Y];
+			else
+				ang += plat->rot.v[k] - plat->oldrot.v[k];
+
+			ang = Aabs(ang);
+
+			d[0] = dist*cos(ang);
+			d[1] = dist*sin(ang);
+			j = 0;
+			for(i = X;i <= Z;i++)
+			{
+				if(plat->spinAxis.v[i] == 0)
+					platform->pos.v[i] = d[j++] + plat->pos.v[i];
+			}
+
+			if(platform->numPathPoints > 1)
+			{
+				dist = sqrt(dd[0]*dd[0] + dd[1]*dd[1]);
+				ang = atan2(dd[1],dd[0]);
+
+				if(k == Y)
+					ang -= plat->rot.v[Y];
+				else
+					ang += plat->rot.v[k];
+
+				ang = Aabs(ang);
+
+				dd[0] = dist*cos(ang);
+				dd[1] = dist*sin(ang);
+				j = 0;
+				for(i = X;i <= Z;i++)
+				{
+					if(plat->spinAxis.v[i] == 0)
+						nextPoint.v[i] = dd[j++];
+				}
+			}
+		}
+	}
+
+	//path following
+  	if((platform->counter <= -4) && (platform->counter >= -9))
+	{
+		if(ball.platform == platform)
+			platform->counter = -4;
+		else
+		{
+			if(--platform->counter == -10)
+				platform->counter = 1;
+		}
+	}
+	if(platform->counter > 0)
+	{
+		if(--platform->counter == 0)
+			platform->nextPoint = (platform->nextPoint + platform->numPathPoints + platform->direction) MOD platform->numPathPoints;
+	}
+	else if((platform->numPathPoints > 1) && (platform->counter == 0))
+	{
+		if(platform->parentPlatform)
+			SubVector(&pos,&platform->pos,&platform->parentPlatform->pos);
+		else
+			SetVector(&pos,&platform->pos);
+
+		SubVector(&distance,&nextPoint,&pos);
+		dist = Magnitude(&distance);
+		if(dist <= platform->speed)
+		{
+			SetVector(&pos,&nextPoint);
+			if(platform->parentPlatform)
+				AddVector(&platform->pos,&pos,&platform->parentPlatform->pos);
+			else
+				SetVector(&platform->pos,&pos);
+
+			SetVector(&platform->vel,&zero);
+			platform->counter = platform->waitTime[platform->nextPoint];
+			platform->currentPoint = platform->nextPoint;//(platform->currentPoint + 1) MOD platform->numPathPoints;
+			if((platform->flags & REVERSING) && ((platform->currentPoint == 0) || (platform->currentPoint == platform->numPathPoints - 1)))
+				platform->direction = -platform->direction;
+			if(platform->currentPoint == 1)
+			{
+				player.timer += platform->timeBonus;
+				if(platform->timeBonus != 0)
+				{
+					CreateStarCircle(&platform->pos, 3);
+					PlaySample(SFX_SWITCH, 0, &platform->pos,100);				
+				}
+			}
+		}
+		else
+		{
+			val = (platform->accel + platform->speed)*platform->speed;
+			val /= 2*platform->accel;
+			val += platform->accel;
+			MakeUnit(&distance);
+			if(dist < val)
+			{
+				if(platform->speed > platform->accel)
+					AddOneScaledVector(&platform->vel,&platform->vel,&distance,-platform->accel);
+			}
+			else
+				AddOneScaledVector(&platform->vel,&platform->vel,&distance,platform->accel);
+			if(platform->orbitSpeed == 0)
+			{
+				platform->speed = Magnitude(&platform->vel);
+				if(platform->speed > platform->maxSpeed)
+					ScaleVector(&platform->vel,platform->maxSpeed/platform->speed);
+			}
+		}
+	}
+
+	//movement and confinement
+	if(platform->orbitSpeed == 0)
+	{
+		for(i = X;i <= Z;i++)
+			platform->pos.v[i] += platform->vel.v[i];
+
+		if(platform->confineBox)
+		{
+			for(i = X;i <= Z;i++)
+			{
+				if(platform->confineBox->size.v[i])
+				{
+					pos.v[i] = platform->pos.v[i];
+					if(plat != NULL)
+						pos.v[i] -= plat->pos.v[i];
+
+					if(pos.v[i] < platform->confineBox->pos.v[i])
+					{
+						pos.v[i] = platform->confineBox->pos.v[i];
+						platform->vel.v[i] = 0;
+					}
+					else if(pos.v[i] > platform->confineBox->pos.v[i] + platform->confineBox->size.v[i])
+					{
+						pos.v[i] = platform->confineBox->pos.v[i] + platform->confineBox->size.v[i];
+						platform->vel.v[i] = 0;
+					}
+					platform->pos.v[i] = pos.v[i];
+					if(plat != NULL)
+						platform->pos.v[i] += plat->pos.v[i];
+				}
+			}
+		}
+	}
+
+	//spinning
+	if(platform->spinSpeed != 0)
+	{
+		for(i = X;i <= Z;i++)
+		{
+			if(platform->spinAxis.v[i] != 0)
+			{
+				if(platform->spinCounter > 0)
+				{
+					platform->spinCounter--;
+					if((platform->spinNumPauses == 1) && (platform->spinCounter == 0))
+						platform->spinCounter = -5;
+				}
+				else if(platform->spinCounter == 0)
+				{
+					if(platform->spinNumPauses > 0)
+					{
+						ang2 = Aabs(platform->rot.v[i] - platform->initRot);
+
+						if(FindShortestAngle(ang2,(PI*2*platform->spinNextPoint)/platform->spinNumPauses) < platform->spinSpeed)
+//						if(FindShortestAngle(Aabs(platform->rot.v[i]),Aabs((PI*2*platform->spinNextPoint)/platform->spinNumPauses)) < fabs(platform->spinSpeed))
+						{
+							platform->spinCounter = platform->spinPauseTime;
+							platform->rotvel.v[i] = 0;
+//							platform->rot.v[i] = Aabs((PI*2*platform->spinNextPoint)/platform->spinNumPauses);
+							platform->spinNextPoint = (platform->spinNextPoint + 1) MOD platform->spinNumPauses;
+						}
+					}
+					else if(platform->spinFlipFlop)
+					{				
+						ang2 = Aabs(platform->rot.v[i] - platform->initRot);
+   						if((FindShortestAngle(ang2,platform->spinFlipFlop) < fabs(platform->spinSpeed)) || (FindShortestAngle(2*PI-platform->spinFlipFlop,ang2) < fabs(platform->spinSpeed)))
+						{
+							platform->spinCounter = platform->spinPauseTime;
+							platform->spinSpeed = -platform->spinSpeed;
+							platform->rotvel.v[i] = 0;
+						}
+					}
+				}
+				if(platform->spinCounter <= 0)
+				{
+					if(platform->spinCounter < 0)
+					{
+						if(platform->spinCounter > -10)
+						{
+							platform->spinCounter++;
+							platform->rotvel.v[i] = platform->spinSpeed;
+						}
+						else if(platform->currentPoint == -platform->spinCounter/10)
+						{
+							if(platform->nextPoint == platform->currentPoint)
+								platform->spinCounter = 1;
+						}
+					}
+					else
+						platform->rotvel.v[i] = platform->spinSpeed;
+				}
+			}
+		}
+	}
+
+	//orbiting
+	if(platform->orbitSpeed != 0)
+	{
+		j = 0;
+		for(i = X;i <= Z;i++)
+		{
+			if(platform->orbitAxis.v[i] == 0)
+			{
+//				d[j] = platform->pos.v[i] - platform->orbitPoint.v[i];
+				d[j] = platform->pos.v[i] - platform->pathPoint[1]->v[i];
+				if(plat != NULL)
+					d[j] -= plat->pos.v[i];
+				j++;
+			}
+		}
+		dist = sqrt(d[0]*d[0] + d[1]*d[1]);
+		ang = atan2(d[1],d[0]);
+
+		if(frameCount == 0)
+			platform->initOrbitRot = ang;
+
+		if(platform->orbitCounter > 0)
+		{
+			platform->orbitCounter--;
+			if((platform->orbitNumPauses == 1) && (platform->orbitCounter == 0))
+				platform->orbitCounter = -2;
+		}
+		else if(platform->orbitCounter == 0)
+		{
+			if(platform->orbitNumPauses > 0)
+			{
+				ang2 = Aabs(ang - platform->initOrbitRot);
+
+				if(FindShortestAngle(ang2,(PI*2*platform->orbitNextPoint)/platform->orbitNumPauses) < platform->orbitSpeed)
+				{
+					platform->orbitCounter = platform->orbitPauseTime;
+					SetVector(&platform->vel,&zero);
+					platform->orbitNextPoint = (platform->orbitNextPoint + 1) MOD platform->orbitNumPauses;
+				}
+			}
+			else if(platform->orbitFlipFlop)
+			{				
+				ang2 = Aabs(ang - platform->initOrbitRot);
+
+   				if((FindShortestAngle(ang2,platform->orbitFlipFlop) < fabs(platform->orbitSpeed)) || (FindShortestAngle(2*PI-platform->orbitFlipFlop,ang2) < fabs(platform->orbitSpeed)))
+				{
+					platform->orbitCounter = platform->orbitPauseTime;
+					platform->orbitSpeed = -platform->orbitSpeed;
+					SetVector(&platform->vel,&zero);
+				}
+			}
+
+		}
+		if(platform->orbitCounter <= 0)
+		{
+			if(platform->orbitCounter < 0)
+				platform->orbitCounter++;			
+			ang += platform->orbitSpeed;
+			ang = Aabs(ang);
+			d[0] = dist*cos(ang);
+			d[1] = dist*sin(ang);
+			j = 0;
+			for(i = X;i <= Z;i++)
+			{
+//				platform->oldpos.v[i] = platform->pos.v[i];
+				if(platform->orbitAxis.v[i] == 0)
+				{
+//					platform->pos.v[i] = d[j++] + platform->orbitPoint.v[i];
+					platform->pos.v[i] = d[j++] + platform->pathPoint[1]->v[i];
+					if(plat != NULL)
+						platform->pos.v[i] += plat->pos.v[i];
+				}
+				platform->vel.v[i] = platform->pos.v[i] - platform->oldpos.v[i];
+			}
+		}
+	}
+
+	//handle rotations
+	for(i = X;i <= Z;i++)
+	{
+		if(platform->flags & SEESAW)
+		{
+			if(platform->rotvel.v[i] > platform->maxRotVel)
+				platform->rotvel.v[i] = platform->maxRotVel;
+			if(platform->rotvel.v[i] < -platform->maxRotVel)
+				platform->rotvel.v[i] = -platform->maxRotVel;
+		}
+
+		if(platform->rAim.v[i] == ON)
+		{
+			if(platform->spinSymmetry > 1)
+			{
+				quad = (platform->spinSymmetry*(Aabs(platform->rot.v[i] - platform->initRot + PI/platform->spinSymmetry)))/(2*PI);
+				platform->rotaim.v[i] = Aabs((quad * PI * 2)/platform->spinSymmetry + platform->initRot);
+			}
+
+//			if((platform->noActorInContactCount > 3) && (platform->turnSpeed != 0))			
+			if((platform->noActorInContactCount > 1) && (platform->turnSpeed != 0))			
+			{
+				ang = FindShortestAngle(platform->rot.v[i],platform->rotaim.v[i]);
+				if(fabs(ang) <= 0.01)
+				{
+					platform->rot.v[i] = platform->rotaim.v[i];
+					platform->rotvel.v[i] *= 0.8;
+				}
+				else if(platform->rot.v[i] < platform->rotaim.v[i] - platform->turnSpeed)
+				{
+					if(platform->rotaim.v[i] - platform->rot.v[i] > PI - platform->turnSpeed)
+						platform->rotvel.v[i] -= Min(platform->turnSpeed,ang);
+					else		
+						platform->rotvel.v[i] += Min(platform->turnSpeed,ang);
+				}
+				else if(platform->rot.v[i] > platform->rotaim.v[i] + platform->turnSpeed)
+				{
+					if(platform->rot.v[i] - platform->rotaim.v[i] > PI + platform->turnSpeed)
+						platform->rotvel.v[i] += Min(platform->turnSpeed,ang);
+					else		
+						platform->rotvel.v[i] -= Min(platform->turnSpeed,ang);
+				}
+
+			}
+		}
+
+		platform->rot.v[i] += platform->rotvel.v[i];
+
+		ang = platform->rot.v[i] > PI ? platform->rot.v[i] - 2 * PI : platform->rot.v[i];
+		ang = ang < -PI ? ang + 2 * PI : ang;
+
+		platform->rot.v[i] = Aabs(platform->rot.v[i]);
+
+		if((platform->maxRot > 0) && (platform->spinAxis.v[i] == 1))
+		{
+			if(ang > platform->initRot + platform->maxRot)
+			{
+				platform->rot.v[i] = platform->initRot + platform->maxRot;
+				platform->rotvel.v[i] = 0;
+			}
+			else if(ang < platform->initRot - platform->maxRot)
+			{
+				platform->rot.v[i] = platform->initRot - platform->maxRot;
+				platform->rotvel.v[i] = 0;
+			}
+		}
+
+		platform->rotvel.v[i] *= platform->rotInertia;
+		if(fabs(platform->rotvel.v[i]) <= 0.0005)
+			platform->rotvel.v[i] = 0;
+		
+	}	
+
+	platform->noActorInContactCount++;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitPlatformInfo()
+	Purpose 	: initialises info for platform's polygons for collision routines
+	Parameters 	: platform
+	Returns 	: none
+	Info 		:
+*/
+void InitPlatformInfo(PLATFORM *platform)
+{
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	D3DVECTOR			normal;
+	LPDIRECT3DRMFACE	face;
+	int					j,k;
+	DWORD				numVertices = 3;
+	double				m;
+	VECTOR				p;
+	PLANE				*planes;
+	double				max = 0;
+	PLATFORM			*plat;
+
+	plat = platform->parentPlatform;
+	while(plat != NULL)
+	{
+		if(plat->flags & TAKESPIN)
+			platform->flags & TILTING;
+		plat = plat->parentPlatform;
+	}
+
+	if((platform->flags & DUMMY) || (platform->flags & BACKGROUND))
+		return;
+
+	SetVector(&platform->initScale,&platform->scale);
+
+	planes = (PLANE *)MyMalloc(platform->faceCount * sizeof(PLANE));	
+
+	InitPlaneList(&platform->planeList);
+
+	for(j = 0;j < platform->faceCount;j++)
+	{
+		(planes+j)->index = j;
+
+		platform->faceArray->GetElement(j,&face);
+//		face->GetVertices(&numVertices,NULL,NULL);		
+		face->GetVertices(&numVertices,vert,vNormal);
+		face->GetNormal(&normal);
+
+		for(k = 0;k < numVertices;k++)
+		{
+			vert[k].x *= platform->scale.v[X];
+			vert[k].y *= platform->scale.v[Y];
+			vert[k].z *= platform->scale.v[Z];
+
+			vert[k].x += platform->pos.v[X];
+			vert[k].y += platform->pos.v[Y];
+			vert[k].z += platform->pos.v[Z];
+		}
+
+		(planes+j)->J = -(vert[0].x*normal.x + vert[0].y*normal.y + vert[0].z*normal.z);
+		m = max(fabs(normal.x),max(fabs(normal.y),fabs(normal.z)));
+		if(m == fabs(normal.x))
+		{
+			(planes+j)->i[0] = 1;
+			(planes+j)->i[1] = 2;
+		}
+		else if (m == fabs(normal.y))
+		{
+			(planes+j)->i[0] = 2;
+			(planes+j)->i[1] = 0;
+		}
+		else
+		{
+			(planes+j)->i[0] = 0;
+			(planes+j)->i[1] = 1;
+		}
+		(planes+j)->normal.v[X] = normal.x;
+		(planes+j)->normal.v[Y] = normal.y;
+		(planes+j)->normal.v[Z] = normal.z;
+
+		(planes+j)->numVertices	= numVertices;
+
+		for(k = 0;k < (planes+j)->numVertices;k++)
+		{
+			(planes+j)->vertex[k].v[X] = vert[k].x;
+			(planes+j)->vertex[k].v[Y] = vert[k].y;
+			(planes+j)->vertex[k].v[Z] = vert[k].z;
+
+			SubVector(&p,&(planes+j)->vertex[k],&platform->pos);
+			m = Magnitude(&p);
+			if(m > max)
+				max = m;			
+			if(vert[k].x - platform->pos.v[X] > platform->size.v[X])
+				platform->size.v[X] = vert[k].x - platform->pos.v[X];
+			if(vert[k].y - platform->pos.v[Y] > platform->size.v[Y])
+				platform->size.v[Y] = vert[k].y - platform->pos.v[Y];
+			if(vert[k].z - platform->pos.v[Z] > platform->size.v[Z])
+				platform->size.v[Z] = vert[k].z - platform->pos.v[Z];
+		}
+
+		(planes+j)->u1 = (planes+j)->vertex[1].v[(planes+j)->i[0]] - (planes+j)->vertex[0].v[(planes+j)->i[0]];
+		(planes+j)->u2 = (planes+j)->vertex[2].v[(planes+j)->i[0]] - (planes+j)->vertex[0].v[(planes+j)->i[0]];
+
+		(planes+j)->v1 = (planes+j)->vertex[1].v[(planes+j)->i[1]] - (planes+j)->vertex[0].v[(planes+j)->i[1]];
+		(planes+j)->v2 = (planes+j)->vertex[2].v[(planes+j)->i[1]] - (planes+j)->vertex[0].v[(planes+j)->i[1]];
+
+		AddPlaneToList(planes+j,&platform->planeList);
+	}
+	platform->radius = platform->initRadius = max;
+}
+						    
+
+/*	--------------------------------------------------------------------------------
+	Function 	: RecalculatePlatformInfo()
+	Purpose 	: recalculates planes info for a platform 
+	Parameters 	: platform
+	Returns 	: none
+	Info 		:
+*/
+void RecalculatePlatformInfo(PLATFORM *platform)
+{
+	PLANE				*plane;
+	PLANELISTENTRY		*ptr = platform->planeList.head.prev;
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	D3DVECTOR			normal;
+	LPDIRECT3DRMFACE	face;
+	int					j,k;
+	DWORD				numVertices = 3;
+	double				m,dist,ang;
+
+	if((platform->flags & DUMMY) || (platform->flags & BACKGROUND))
+		return;
+
+	platform->lastCalcFrame = frameCount;
+
+	for(j = 0;j < platform->faceCount;j++)
+	{
+		plane = ptr->plane;
+
+		ptr = ptr->prev;
+
+		platform->faceArray->GetElement(j,&face);
+//		face->GetVertices(&numVertices,NULL,NULL);		
+		face->GetVertices(&numVertices,vert,vNormal);
+		face->GetNormal(&normal);
+
+		for(k = 0;k < numVertices;k++)
+		{
+			vert[k].x *= platform->scale.v[X];
+			vert[k].y *= platform->scale.v[Y];
+			vert[k].z *= platform->scale.v[Z];
+		}
+
+		if(platform->rot.v[X] != 0)
+		{
+			for(k = 0;k < numVertices;k++)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].z,vert[k].y);
+				ang += platform->rot.v[X];
+				ang = Aabs(ang);
+
+				vert[k].z = dist*sin(ang);
+				vert[k].y = dist*cos(ang);
+			}
+		}
+		if(platform->rot.v[Z] != 0)
+		{
+			for(k = 0;k < numVertices;k++)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].x*vert[k].x);
+
+				ang = atan2(vert[k].y,vert[k].x);
+				ang += platform->rot.v[Z];
+				ang = Aabs(ang);
+
+				vert[k].y = dist*sin(ang);
+				vert[k].x = dist*cos(ang);
+			}
+		}
+		if(platform->rot.v[Y] != 0)
+		{
+			for(k = 0;k < numVertices;k++)
+			{
+				dist = sqrt(vert[k].x*vert[k].x + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].x,vert[k].z);
+				ang += platform->rot.v[Y];
+				ang = Aabs(ang);
+
+				vert[k].x = dist*sin(ang);
+				vert[k].z = dist*cos(ang);
+			}
+		}
+
+		for(k = 0;k < numVertices;k++)
+		{
+			vert[k].x += platform->pos.v[X];
+			vert[k].y += platform->pos.v[Y];
+			vert[k].z += platform->pos.v[Z];
+		}
+
+		if(platform->rot.v[X] != 0)
+		{
+			ang = atan2(normal.z,normal.y);
+			ang += platform->rot.v[X];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.z*normal.z);
+
+			normal.z = dist*sin(ang);
+			normal.y = dist*cos(ang);
+		}
+		if(platform->rot.v[Z] != 0)
+		{
+			ang = atan2(normal.y,normal.x);
+			ang += platform->rot.v[Z];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.x*normal.x);
+
+			normal.y = dist*sin(ang);
+			normal.x = dist*cos(ang);
+		}
+		if(platform->rot.v[Y] != 0)
+		{
+			ang = atan2(normal.x,normal.z);
+			ang += platform->rot.v[Y];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.x*normal.x + normal.z*normal.z);
+
+			normal.x = dist*sin(ang);
+			normal.z = dist*cos(ang);
+		}
+
+		plane->J = -(vert[0].x*normal.x + vert[0].y*normal.y + vert[0].z*normal.z);
+		
+		if(platform->flags & TILTING)
+		{
+			m = max(fabs(normal.x),max(fabs(normal.y),fabs(normal.z)));
+			if(m == fabs(normal.x))
+			{
+				plane->i[0] = 1;
+				plane->i[1] = 2;
+			}
+			else if(m == fabs(normal.y))
+			{
+				plane->i[0] = 2;
+				plane->i[1] = 0;
+			}
+			else
+			{
+				plane->i[0] = 0;
+				plane->i[1] = 1;
+			}
+			plane->normal.v[X] = normal.x;
+			plane->normal.v[Y] = normal.y;
+			plane->normal.v[Z] = normal.z;
+		}
+
+		for(k = 0;k < plane->numVertices;k++)
+		{
+			plane->vertex[k].v[X] = vert[k].x;
+			plane->vertex[k].v[Y] = vert[k].y;
+			plane->vertex[k].v[Z] = vert[k].z;
+		}
+		plane->u1 = plane->vertex[1].v[plane->i[0]] - plane->vertex[0].v[plane->i[0]];
+		plane->u2 = plane->vertex[2].v[plane->i[0]] - plane->vertex[0].v[plane->i[0]];
+
+		plane->v1 = plane->vertex[1].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+		plane->v2 = plane->vertex[2].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+	}
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: RecalculatePlatformInfo()
+	Purpose 	: recalculates planes info for a platform 
+	Parameters 	: platform
+	Returns 	: none
+	Info 		:
+*/
+void RecalculatePlatformInfoOld(PLATFORM *platform)
+{
+	PLANE				*plane;
+	PLANELISTENTRY		*ptr = platform->planeList.head.prev;
+	D3DVECTOR			vert[4];
+	D3DVECTOR			vNormal[4];
+	D3DVECTOR			normal;
+	LPDIRECT3DRMFACE	face;
+	int					j,k;
+	DWORD				numVertices;
+	double				m,dist,ang;
+
+	if((platform->flags & DUMMY) || (platform->flags & BACKGROUND))
+		return;
+
+	platform->lastCalcFrame = frameCount;
+
+	for(j = 0;j < platform->faceCount;j++)
+	{
+		plane = ptr->plane;
+
+		ptr = ptr->prev;
+
+		platform->faceArray->GetElement(j,&face);
+		face->GetVertices(&numVertices,NULL,NULL);		
+		face->GetVertices(&numVertices,vert,vNormal);
+		face->GetNormal(&normal);
+
+		for(k = 0;k < numVertices;k++)
+		{
+			vert[k].x *= platform->scale.v[X];
+			vert[k].y *= platform->scale.v[Y];
+			vert[k].z *= platform->scale.v[Z];
+
+			if(platform->rot.v[X] != 0)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].z,vert[k].y);
+				ang += platform->rot.v[X];
+				ang = Aabs(ang);
+
+				vert[k].z = dist*sin(ang);
+				vert[k].y = dist*cos(ang);
+			}
+			if(platform->rot.v[Z] != 0)
+			{
+				dist = sqrt(vert[k].y*vert[k].y + vert[k].x*vert[k].x);
+
+				ang = atan2(vert[k].y,vert[k].x);
+				ang += platform->rot.v[Z];
+				ang = Aabs(ang);
+
+				vert[k].y = dist*sin(ang);
+				vert[k].x = dist*cos(ang);
+			}
+			if(platform->rot.v[Y] != 0)
+			{
+				dist = sqrt(vert[k].x*vert[k].x + vert[k].z*vert[k].z);
+
+				ang = atan2(vert[k].x,vert[k].z);
+				ang += platform->rot.v[Y];
+				ang = Aabs(ang);
+
+				vert[k].x = dist*sin(ang);
+				vert[k].z = dist*cos(ang);
+			}
+
+			vert[k].x += platform->pos.v[X];
+			vert[k].y += platform->pos.v[Y];
+			vert[k].z += platform->pos.v[Z];
+		}
+
+		if(platform->rot.v[X] != 0)
+		{
+			ang = atan2(normal.z,normal.y);
+			ang += platform->rot.v[X];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.z*normal.z);
+
+			normal.z = dist*sin(ang);
+			normal.y = dist*cos(ang);
+		}
+		if(platform->rot.v[Z] != 0)
+		{
+			ang = atan2(normal.y,normal.x);
+			ang += platform->rot.v[Z];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.y*normal.y + normal.x*normal.x);
+
+			normal.y = dist*sin(ang);
+			normal.x = dist*cos(ang);
+		}
+		if(platform->rot.v[Y] != 0)
+		{
+			ang = atan2(normal.x,normal.z);
+			ang += platform->rot.v[Y];
+			ang = Aabs(ang);
+
+			dist = sqrt(normal.x*normal.x + normal.z*normal.z);
+
+			normal.x = dist*sin(ang);
+			normal.z = dist*cos(ang);
+		}
+
+		plane->J = -(vert[0].x*normal.x + vert[0].y*normal.y + vert[0].z*normal.z);
+		
+		if(platform->flags & TILTING)
+		{
+			m = max(fabs(normal.x),max(fabs(normal.y),fabs(normal.z)));
+			if(m == fabs(normal.x))
+			{
+				plane->i[0] = 1;
+				plane->i[1] = 2;
+			}
+			else if(m == fabs(normal.y))
+			{
+				plane->i[0] = 2;
+				plane->i[1] = 0;
+			}
+			else
+			{
+				plane->i[0] = 0;
+				plane->i[1] = 1;
+			}
+			plane->normal.v[X] = normal.x;
+			plane->normal.v[Y] = normal.y;
+			plane->normal.v[Z] = normal.z;
+		}
+
+		for(k = 0;k < plane->numVertices;k++)
+		{
+			plane->vertex[k].v[X] = vert[k].x;
+			plane->vertex[k].v[Y] = vert[k].y;
+			plane->vertex[k].v[Z] = vert[k].z;
+		}
+		plane->u1 = plane->vertex[1].v[plane->i[0]] - plane->vertex[0].v[plane->i[0]];
+		plane->u2 = plane->vertex[2].v[plane->i[0]] - plane->vertex[0].v[plane->i[0]];
+
+		plane->v1 = plane->vertex[1].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+		plane->v2 = plane->vertex[2].v[plane->i[1]] - plane->vertex[0].v[plane->i[1]];
+	}
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: TagToPlatform()
+	Purpose 	: finds first platform in list with given tag
+	Parameters 	: tag
+	Returns 	: pointer to platform
+	Info 		:
+*/
+PLATFORM *TagToPlatform(int tag)
+{
+	PLATFORMLISTENTRY	*ptr;
+
+	for(ptr = platformList.head.next;ptr != &platformList.head;ptr = ptr->next)
+		if(ptr->platform->tag == tag)
+			return ptr->platform;
+	return NULL;
+}
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: UpdateRopeBridges()
+	Purpose 	: updates...
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void UpdateRopeBridges()
+{
+	int		j,k,x;
+	VECTOR	rotvel[100],tempVect;
+	PLATFORM	*platform1,*platform2;
+
+	for(k = 0;k < NUMROPEBRIDGES;k++)
+	{
+		if(ropeBridge[k].rotVelTransmit == 0)
+			return;
+
+ 		for(x = ropeBridge[k].minTag;x <= ropeBridge[k].maxTag;x++)
+			SetVector(&rotvel[x-ropeBridge[k].minTag],&zero);
+
+ 		for(x = ropeBridge[k].minTag;x <= ropeBridge[k].maxTag;x++)
+		{
+			platform1 = TagToPlatform(x);
+
+			if(x > ropeBridge[k].minTag)
+			{
+				platform2 = TagToPlatform(x-1);
+				for(j = X;j <= Z;j++)
+ 					tempVect.v[j] = FindShortestAngleSigned(platform1->rot.v[j],platform2->rot.v[j]);
+				AddOneScaledVector(&rotvel[x-1-ropeBridge[k].minTag],&rotvel[x-1-ropeBridge[k].minTag],&tempVect,ropeBridge[k].rotVelTransmit);
+			}
+			if(x < ropeBridge[k].maxTag)
+			{
+				platform2 = TagToPlatform(x+1);
+				for(j = X;j <= Z;j++)
+					tempVect.v[j] = FindShortestAngleSigned(platform1->rot.v[j],platform2->rot.v[j]);
+				AddOneScaledVector(&rotvel[x+1-ropeBridge[k].minTag],&rotvel[x+1-ropeBridge[k].minTag],&tempVect,ropeBridge[k].rotVelTransmit);
+			}
+		}
+
+		if(ropeBridge[k].type == 1)
+			ScaleVector(&rotvel[0],0.075);
+		platform1 = TagToPlatform(ropeBridge[k].minTag);
+		AddVector(&platform1->rotvel,&platform1->rotvel,&rotvel[0]);
+
+		if(ropeBridge[k].type == 1)
+			ScaleVector(&rotvel[ropeBridge[k].maxTag - ropeBridge[k].minTag],0.075);
+		platform1 = TagToPlatform(ropeBridge[k].maxTag);
+		AddVector(&platform1->rotvel,&platform1->rotvel,&rotvel[ropeBridge[k].maxTag - ropeBridge[k].minTag]);
+
+		for(x = ropeBridge[k].minTag + 1;x <= ropeBridge[k].maxTag - 1;x++)
+		{
+			platform1 = TagToPlatform(x);
+			if(platform1->noActorInContactCount > 1)
+				AddVector(&platform1->rotvel,&platform1->rotvel,&rotvel[x-ropeBridge[k].minTag]);
+		}	
+ 	}
+}
+

@@ -1,0 +1,338 @@
+/*
+ *	Project:		Oddballs
+ *	File:			personal.cpp
+ *	Description:	personal flags etc
+ */
+
+#include "oddballs.h"
+#include "personal.h"
+#include "anim.h"
+#include "scene.h"
+#include "actors.h"
+#include "collision.h"
+#include "hand.h"
+#include "maths.h"
+
+#include "nmebehaviour.h"
+#include "cam.h"
+
+
+long	detailFlags = DF_TEXTURED + DF_WOODY + DF_GOURAUD + DF_HARDWARE;
+
+animation handanims[20];
+animation batanims[20];
+
+char outputMessage[256];
+
+char rootPath[] = {"e:\\pc\\oddballs\\"};
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: InitScene()
+	Purpose 	: personal scene initialisation
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void InitScene(LPDIRECT3DRMFRAME scene)
+{
+	char temp[256];
+
+
+	ResetBall();
+	ResetBat();
+
+	InitActorList();
+	AddActor(&camera);
+	AddActor(&hand);
+	AddActor(&ball);
+	
+
+	InitActor(&landscape);
+	sprintf(temp, "%sdock\\dock.x", rootPath);
+	LoadMeshIntoActor(&landscape,scene,"graphics\\dock\\dock.x");
+
+	InitActor(&hand);
+	LoadActor(&hand, scene, "graphics\\hand\\model.x");
+	
+	if(LoadAnimation(&handanims[HANDANIM_WALK], 20, 1, "graphics\\hand\\walk.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_STAND], 10, 1, "graphics\\hand\\idle.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_ST2CUP], 10, 1, "graphics\\hand\\st_cup.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_ST2WALK], 5, 1, "graphics\\hand\\st_walk.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_WHACK1], 3, 1, "graphics\\hand\\whack1.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_WHACK2], 9, 1, "graphics\\hand\\whack2.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_CUP2ST], 10, 1, "graphics\\hand\\cup_st.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_ST2DUCK], 8, 1, "graphics\\hand\\duck.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_DUCK2ST], 8, 1, "graphics\\hand\\duck_st.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_JUMP], 10, 0.5, "graphics\\hand\\jump.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+
+	if(LoadAnimation(&handanims[HANDANIM_THROWAIM], 5, 1, "graphics\\hand\\throw1.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_THROW], 9, 1, "graphics\\hand\\throw2.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&handanims[HANDANIM_THROW2CUP], 5, 1, "graphics\\hand\\thrw_cup.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+
+	AttachAnimations(&hand, handanims);
+
+
+	InitActor(&ball);
+	LoadActor(&ball, scene, "graphics\\ball\\ball.x");
+
+/*
+	AddActor(&bat);
+	InitActor(&bat);
+	LoadActor(&bat, scene, "graphics\\bat\\batstand.x");
+
+	if(LoadAnimation(&batanims[NMEANIM_IDLE], 1, 1, "graphics\\bat\\batstand.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&batanims[NMEANIM_WALK], 15, 2, "graphics\\bat\\batwalk.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&batanims[NMEANIM_TAKEOFF], 15, 2, "graphics\\bat\\takeoff.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+	if(LoadAnimation(&batanims[NMEANIM_FLY], 15, 2, "graphics\\bat\\batfly.x") == FALSE)
+		dprintf("Animation Load Failed\n");
+
+	AttachAnimations(&bat, batanims);
+
+
+
+
+
+	testScript.currentCommand = 0;
+	testScript.numberOfCommands = 1;
+	testScript.instruction = testInstruction;
+	bat.actorScript = &testScript;
+*/ 
+	AddActor(&test);
+	InitActor(&test);
+	lpD3DRM->CreateFrame(scene,&test.frame);
+	LoadActor(&test, scene, "graphics\\hand\\model.x");
+
+
+    myglobs.bShowFrameRate = FALSE;
+//    myglobs.bShowInfo = FALSE;
+
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ResetHand()
+	Purpose 	: resets the hand positoins
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ResetHand()
+{
+	memset(&hand, 0, sizeof(ACTOR));
+	hand.pos.v[X] = 10;
+	hand.pos.v[Y] = 35;
+	hand.pos.v[Z] = 13;
+	hand.velInertia = HAND_INERTIA;
+	hand.rotInertia = HAND_INERTIA;
+	hand.rAim.v[Y] = ON;
+	hand.rAim.v[X] = ON;
+	hand.flags = COLLISION + GRAVITY + DECELERATE;
+	hand.radius = 1.5;
+	hand.maxSpeed = 1;
+	hand.stopSpeed = 0.12;
+	hand.slideLimit = 0;
+	hand.action = HAND_IDLE;
+	hand.lastAction = HAND_IDLE;
+	hand.normInertia = hand.velInertia;
+}
+void RestartHand()
+{
+
+	hand.pos.v[X] = 10;
+	hand.pos.v[Y] = 15;
+	hand.pos.v[Z] = 13;
+	SetVector(&hand.vel, &zero);
+	hand.flags = COLLISION + GRAVITY;
+	hand.radius = 1.5;
+	hand.maxSpeed = 1;
+	hand.action = HAND_IDLE;
+	AnimateActor(&hand,HANDANIM_STAND, YES, NO, 1);
+
+}
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ResetCamera()
+	Purpose 	: resets the camera positoins
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ResetCamera()
+{
+	memset(&camera, 0, sizeof(ACTOR));
+	camera.pos.v[X] = 0;
+	camera.pos.v[Y] = 10;
+	camera.pos.v[Z] = -40;
+	camera.rotvel.v[X] = 0.06;
+	camera.velInertia = CAMERA_INERTIA;
+	camera.rotInertia = CAMERA_INERTIA;
+	camera.normInertia = camera.velInertia;
+	camera.maxSpeed = 2;
+
+	cameraInfo.distanceFromHand = 20;
+	cameraInfo.rotationBias = PI;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ResetCamera()
+	Purpose 	: resets the camera positoins
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ResetBall()
+{
+	memset(&ball, 0, sizeof(ACTOR));
+	ball.pos.v[X] = 0;
+	ball.pos.v[Y] = 15;
+	ball.pos.v[Z] = 13;
+
+	ball.rAim.v[Y] = ON;
+	ball.velInertia = 0.9;
+	ball.rotInertia = HAND_INERTIA;
+	ball.flags = GRAVITY + COLLISION + ROLLING;
+	ball.radius = 0.9;
+	ball.bounce = 0.8;
+  	ball.maxSpeed = 2;
+	ball.stopSpeed = 0.05;
+	ball.slideLimit = 0.99;
+	ball.normInertia = ball.velInertia;
+
+}
+void RestartBall()
+{
+	ball.pos.v[X] = 0;
+ 	ball.pos.v[Y] = 15;
+	ball.pos.v[Z] = 13;
+	SetVector(&ball.vel, &zero);
+	ball.flags = GRAVITY + COLLISION + ROLLING;
+	ball.radius = 0.9;
+	ball.bounce = 0.8;
+}
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ResetBat()
+	Purpose 	: resets the bat positoins
+	Parameters 	: none
+	Returns 	: none
+	Info 		:
+*/
+void ResetBat()
+{
+	memset(&bat, 0, sizeof(ACTOR));
+	bat.pos.v[X] = 10;
+	bat.pos.v[Y] = 15;
+	bat.pos.v[Z] = 13;
+	bat.rAim.v[Y] = ON;
+	bat.velInertia = 0.7;
+	bat.rotInertia = HAND_INERTIA;
+	bat.flags = GRAVITY + COLLISION;
+	bat.radius = 2.9;
+	bat.bounce = 0.1;
+	bat.maxSpeed = 0.7;
+	bat.normInertia = bat.velInertia;
+}
+void RestartBat()
+{
+	bat.pos.v[X] = 10;
+	bat.pos.v[Y] = 15;
+	bat.pos.v[Z] = 13;
+	SetVector(&bat.vel, &zero);
+	InitActorScript(&bat);
+	AnimateActor(&bat,NMEANIM_WALK, YES, NO, 0);
+}
+
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: ProcessPersonalKeys()
+	Purpose 	: special keys just for me
+	Parameters 	: WPARAM key.
+	Returns 	: none
+	Info 		:
+*/
+void ProcessPersonalKeys(WPARAM key)
+{
+	switch(key)
+	{
+		case	VK_1:	
+						cameraInfo.distanceFromHand = 10;
+						break;
+		case	VK_2:	
+						cameraInfo.distanceFromHand = 20;
+						break;
+		case	VK_3:	
+						cameraInfo.distanceFromHand = 30;
+						break;
+/*
+		case	VK_4:	
+						AnimateActor(&hand,HANDANIM_STAND, YES, NO, 1);
+						break;
+		case	VK_5:	
+						AnimateActor(&hand,4, YES, NO, 1);
+						break;
+		case	VK_6:	
+						AnimateActor(&hand,5, YES, NO, 1);
+						break;
+		case	VK_7:	
+						AnimateActor(&hand,HANDANIM_THROW, YES, NO, 1);
+						break;
+*/
+		case	VK_R:	
+						RestartBall();
+						RestartHand();
+//						RestartBat();
+						break;
+
+
+		case	VK_TAB:
+						cameraFollow = 1 - cameraFollow;
+						break;
+
+/*
+		case	VK_Z:	
+						cameraInfo.rotationBias = Aabs(cameraInfo.rotationBias - (PI / 2));
+						break;
+		case	VK_X:	
+						cameraInfo.rotationBias = Aabs(cameraInfo.rotationBias + (PI / 2));
+						break;
+*/
+
+	}
+
+}
+
+
+/*	--------------------------------------------------------------------------------
+	Function 	: 
+	Purpose 	: sort out my stuff
+	Parameters 	: 
+	Returns 	: 
+	Info 		:
+*/
+void ProcessPersonalLoop()
+{
+
+	sprintf(outputMessage, "%f", Magnitude2D(&hand.vel));
+	WriteInfoBuffer(outputMessage, 0, 0);
+
+	MoveHand();
+	MoveCam();
+}

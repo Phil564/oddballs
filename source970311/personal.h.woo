@@ -1,0 +1,27 @@
+/*
+ *	Project:		Oddballs
+ *	File:			personal.h
+ *	Description:	personal options
+ */
+
+#ifndef __PERSONAL_H
+#define __PERSONAL_H
+
+extern long detailFlags;
+
+extern animation batanims[];
+extern char outputMessage[];
+extern char rootPath[];
+
+
+
+void ResetCamera();
+void ResetHand();
+void ResetBall();
+void ResetBat();
+
+void InitScene(LPDIRECT3DRMFRAME scene);
+void ProcessPersonalKeys(WPARAM key);
+void ProcessPersonalLoop();
+
+#endif

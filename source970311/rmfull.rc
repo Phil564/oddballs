@@ -1,0 +1,185 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "rmfullrc.h"
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "windows.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.K.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+APPICON                 ICON    DISCARDABLE     "d3d.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+APPMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&About..\tF1",                MENU_ABOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Single Step\tSpc",           MENU_STEP
+        MENUITEM "&Go\tEnter",                  MENU_GO
+        MENUITEM "&Toggle Stats\tTab",          MENU_STATS
+        MENUITEM SEPARATOR
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tESC",                  MENU_EXIT
+    END
+    POPUP "&Render"
+    BEGIN
+        MENUITEM "&Flat\tF2",                   MENU_FLAT
+        MENUITEM "&Gouraud\tF3",                MENU_GOURAUD
+        MENUITEM "P&hong\tF4",                  MENU_PHONG
+        MENUITEM SEPARATOR
+        MENUITEM "L&ighting\tF5",               MENU_LIGHTING
+        MENUITEM SEPARATOR
+        MENUITEM "&Point\tCtrl+P",              MENU_POINT
+        MENUITEM "&Wireframe\tCtrl+W",          MENU_WIREFRAME
+        MENUITEM "&Solid\tCtrl+S",              MENU_SOLID
+        MENUITEM SEPARATOR
+        MENUITEM "&Dithering\tCtrl+D",          MENU_DITHERING
+        MENUITEM "&Anti-aliasing\tCtrl+A",      MENU_ANTIALIAS
+        MENUITEM SEPARATOR
+        MENUITEM "P&oint Filtering\tCtrl+O",    MENU_POINT_FILTER
+        MENUITEM "Bi-&Linear Filtering\tCtrl+L", MENU_LINEAR_FILTER
+    END
+    POPUP "&Modes"
+    BEGIN
+        MENUITEM "&Fullscreen\tAlt+Enter",      MENU_FULLSCREEN
+        MENUITEM "&Previous Mode\tAlt+PgUp",    MENU_PREVIOUS_MODE
+        MENUITEM "&Next Mode\tAlt+PgDown",      MENU_NEXT_MODE
+        MENUITEM SEPARATOR
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+APPACCEL ACCELERATORS DISCARDABLE 
+BEGIN
+    "A",            MENU_ANTIALIAS,         VIRTKEY, CONTROL, NOINVERT
+    "D",            MENU_DITHERING,         VIRTKEY, CONTROL, NOINVERT
+    "L",            MENU_LINEAR_FILTER,     VIRTKEY, CONTROL, NOINVERT
+    "O",            MENU_POINT_FILTER,      VIRTKEY, CONTROL, NOINVERT
+    "P",            MENU_POINT,             VIRTKEY, CONTROL, NOINVERT
+    "S",            MENU_SOLID,             VIRTKEY, CONTROL, NOINVERT
+    VK_ESCAPE,      MENU_EXIT,              VIRTKEY, NOINVERT
+    VK_F1,          MENU_ABOUT,             VIRTKEY, NOINVERT
+    VK_F2,          MENU_FLAT,              VIRTKEY, NOINVERT
+    VK_F3,          MENU_GOURAUD,           VIRTKEY, NOINVERT
+    VK_F4,          MENU_PHONG,             VIRTKEY, NOINVERT
+    VK_F5,          MENU_LIGHTING,          VIRTKEY, NOINVERT
+    VK_NEXT,        MENU_NEXT_MODE,         VIRTKEY, ALT, NOINVERT
+    VK_PRIOR,       MENU_PREVIOUS_MODE,     VIRTKEY, ALT, NOINVERT
+    VK_RETURN,      MENU_GO,                VIRTKEY, NOINVERT
+    VK_RETURN,      MENU_FULLSCREEN,        VIRTKEY, ALT, NOINVERT
+    VK_SPACE,       MENU_STEP,              VIRTKEY, NOINVERT
+    "W",            MENU_WIREFRAME,         VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+APPABOUT DIALOG DISCARDABLE  0, 0, 188, 96
+STYLE DS_MODALFRAME | WS_POPUP
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,76,75,35,14
+    CTEXT           "Whack 'N Roll Demo",IDC_STATIC,61,5,65,15
+    CTEXT           "Copyright (c)1996 Interactive Studios Limited",
+                    IDC_STATIC,21,55,145,12
+    ICON            "AppIcon",IDC_STATIC,86,25,18,20
+END
+
+1 VERSIONINFO
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "LegalCopyright", "Copyright (c)1996 Interactive Studios Limited"
+            VALUE "OriginalFilename", "oddballs.exe"
+            VALUE "ProductName", "Whack 'N Roll Demo"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""rmfullrc.h""\r\n"
+    "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "#include ""windows.h""\r\n"
+    "#undef APSTUDIO_HIDDEN_SYMBOLS\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.K.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

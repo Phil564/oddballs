@@ -1,0 +1,15 @@
+LANDSCAPE
+12
+dock\dock.x 0 0 0
+dock\dock.x 50 0 0
+dock\dock.x 50 0 50
+dock\dock.x 0 0 50
+dock\dock.x 100 0 0
+dock\dock.x 100 0 50
+dock\dock.x 0 0 100
+dock\dock.x 50 0 100
+dock\dock.x 100 0 100
+dock\dock.x 150 0 0
+dock\dock.x 150 0 50
+dock\dock.x 150 0 100
+
