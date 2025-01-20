@@ -28,22 +28,13 @@
 #include "sound.h"
 #include "graphics.h"
 #include "rmstats.h"
-#ifdef _FIXES
-#include "rm.h"
-#include "d3dappe.h"
-#include "rmdemo.h"
-#include "rmfull.h"
-#include "rmfullrc.h"
-#endif
 
 /*
  * GLOBAL VARIABLES
  */
 D3DAppInfo* d3dapp;         /* Pointer to read only collection of DD and D3D
                                objects maintained by D3DApp */
-#ifndef _FIXES
 rmfullglobals myglobs;      /* collection of global variables */
-#endif
 LPDIRECT3DRM lpD3DRM;           /* Direct3DRM object */
 
 /*
@@ -147,7 +138,6 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
     return msg.wParam;
 }
 */
-#ifndef _FIXES
 int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
 {
     MSG msg;
@@ -244,7 +234,7 @@ int FAR PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
     // Exit WinMain and terminate the app....
     return msg.wParam;
 }
-#endif
+
 /****************************************************************************/
 /*             D3DApp Initialization and callback functions                 */
 /****************************************************************************/
@@ -1342,7 +1332,6 @@ ReportD3DAppError(void)
     Msg("%s", D3DAppLastErrorString());
 }
 
-#ifndef _FIXES
 /* Msg
  * Message output for error notification.
  */
@@ -1362,7 +1351,6 @@ void Msg( LPSTR fmt, ... )
                      SWP_NOSIZE | SWP_NOMOVE);
     AppPause(FALSE);
 }
-#endif
 
 /*
  * D3DRMErrorToString

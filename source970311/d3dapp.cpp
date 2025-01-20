@@ -979,7 +979,6 @@ exit_with_error:
     return FALSE;
 }
 
-#ifndef _FIXES
 /*
  * D3DAppPause
  */
@@ -1066,7 +1065,6 @@ D3DAppPause(BOOL flag)
 exit_with_error:
     return FALSE;
 }
-#endif
 
 /*
  * D3DAppCreateSurface
@@ -1127,7 +1125,7 @@ exit_with_error:
     return FALSE;
 }
 
-#ifndef _FIXES
+
 /*
  * D3DAppErrorToString
  */
@@ -1399,4 +1397,3 @@ D3DAppErrorToString(HRESULT error)
             return "Unrecognized error value.\0";
     }
 }
-#endif

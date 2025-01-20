@@ -29,10 +29,8 @@ extern "C" {
     /*
      * Builds the scene.
      */
-#ifndef _FIXES
     BOOL BuildScene(LPDIRECT3DRMDEVICE dev, LPDIRECT3DRMVIEWPORT view, LPDIRECT3DRMFRAME scene,
                         LPDIRECT3DRMFRAME camera);
-#endif
 
     /*
      * Allows each example to begin with different defaults

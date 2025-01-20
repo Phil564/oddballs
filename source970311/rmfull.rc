@@ -123,6 +123,7 @@ BEGIN
     ICON            "AppIcon",IDC_STATIC,86,25,18,20
 END
 
+#if defined(_FIXES)
 1 VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
@@ -139,6 +140,7 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
+#endif
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////

@@ -71,30 +71,27 @@ extern DWORD                    g_hbar2;                // Defined in DIRECTX.CP
 
 typedef struct tagrmfullglobals 
 {
-#ifdef _FIXES
-    HWND hWndMain;          /* application window handle */
-    HINSTANCE hInstApp;     /* application instance for dialog boxes */
+//    HWND hWndMain;          /* application window handle */
+//    HINSTANCE hInstApp;     /* application instance for dialog boxes */
 
-    LPDIRECT3DRMDEVICE dev;     /* Direct3DRM device */
-    LPDIRECT3DRMVIEWPORT view;  /* Direct3DRM viewport through which we view
-                                   the scene */
-    LPDIRECT3DRMFRAME scene;    /* Master frame in which others are placed */
-#endif
+//    LPDIRECT3DRMDEVICE dev;     /* Direct3DRM device */
+//    LPDIRECT3DRMVIEWPORT view;  /* Direct3DRM viewport through which we view
+//                                   the scene */
+//    LPDIRECT3DRMFRAME scene;    /* Master frame in which others are placed */
+
     BOOL bSingleStepMode;        /* render one frame at a time */
     BOOL bDrawAFrame;            /* render on this pass of the main loop */
     BOOL bShowFrameRate;         /* show the frame rate at the top */
     BOOL bShowInfo;              /* show window information at the bottom */
-#ifdef _FIXES
-    BOOL bResized; /* the window has resized or some other drastic change, the
-                      entire client area should be cleared */
-#endif
+
+//    BOOL bResized; /* the window has resized or some other drastic change, the
+//                      entire client area should be cleared */
     BOOL bQuit;    /* program is about to terminate */
-#ifdef _FIXES
-    BOOL bNoTextures;           /* this sample doesn't use any textures */
-    BOOL bConstRenderQuality;   /* this sample is not constructed with
-                                   MeshBuilders and so the RenderQuality
-                                   cannot be changed */
-#endif
+
+//    BOOL bNoTextures;           /* this sample doesn't use any textures */
+//    BOOL bConstRenderQuality;   /* this sample is not constructed with
+//                                   MeshBuilders and so the RenderQuality
+//                                   cannot be changed */
     D3DRMRENDERQUALITY RenderQuality;   /* current shade mode, fill mode and
                                            lighting state */
     D3DRMTEXTUREQUALITY TextureQuality; /* current texture interpolation */

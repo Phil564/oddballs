@@ -35,7 +35,15 @@ animation ballanims[MAX_HANDANIMS];
 
 char outputMessage[256];
 
+#ifdef _FIXES
+#ifdef DEBUG
+char rootPath[] = {"..\\..\\..\\"};
+#else
+char rootPath[] = {".\\"};
+#endif
+#else
 char rootPath[] = {"\\pc\\oddballs\\"};
+#endif
 //char levelToLoad[] = {"level1\\level1"};
 //char levelToLoad[] = {"dock\\dock"};
 char levelToLoad[] = {"level1\\dockwoody"};

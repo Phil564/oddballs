@@ -27,7 +27,6 @@
 //extern "C" {
 #endif
 
-#ifndef _FIXES
 typedef struct tagrmfullglobals {
     HWND hWndMain;          /* application window handle */
     HINSTANCE hInstApp;     /* application instance for dialog boxes */
@@ -65,7 +64,6 @@ typedef struct tagrmfullglobals {
 
 
 } rmfullglobals;
-#endif
 
 extern rmfullglobals myglobs;      /* collection of global variables */
 
