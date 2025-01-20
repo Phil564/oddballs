@@ -7,7 +7,7 @@ Late 96' & Early 97' source backups of Glover made easier to compile.
 - a majority of the file names that were cut by DOS were restored
 - (_FIXES define) a "debug.log" file is now created next to the executable during gameplay.
 - (_FIXES define) VERSIONINFO is added to the executable
-- (_FIXES define, 970311 only) set rootPath in personal.cpp to `{"..\\..\\..\\"}`
+- (_FIXES define, 970311 only) set rootPath in personal.cpp to `{"..\\..\\..\\"}` On release builds, it is set to `{".\\"}`.
 
 ## Setup
 1. Please place the repository close to the root of the drive in the "Pc" folder (example: E:\Pc\oddballs) if you don't plan on building with fixes.
@@ -34,7 +34,7 @@ The build from Glover1and2BackupData.7z/FromOldBackups.zip/SOURCE/RELEASE should
 5. Enjoy the game. (970311 only) It is recommended to change the level path in personal.cpp (level1/dockwoody and dock/dock are confirmed to work).
 
 ## file paths in the leak
-graphics: Glover1and2BackupData.7z/FromOldBackups.zip/GRAPHICS
-sound: Glover1and2BackupData.7z/FromOldBackups.zip/SOUND
-source960912: Glover1and2BackupData.7z/FromOldBackups.zip/BACKUP/CODE.ZIP
-source970311: Glover1and2BackupData.7z/FromOldBackups.zip/SOURCE
+- graphics: Glover1and2BackupData.7z/FromOldBackups.zip/GRAPHICS
+- sound: Glover1and2BackupData.7z/FromOldBackups.zip/SOUND
+- source960912: Glover1and2BackupData.7z/FromOldBackups.zip/BACKUP/CODE.ZIP
+- source970311: Glover1and2BackupData.7z/FromOldBackups.zip/SOURCE
